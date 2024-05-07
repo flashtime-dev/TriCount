@@ -49,15 +49,15 @@ public class Grupo {
     }
 
     //Métodos
-    public void AnadirUsuario() {
+    public void anadirUsuario() {
 
     }
 
-    public void EliminarUsuario() {
+    public void eliminarUsuario() {
 
     }
 
-    public void CambiarAdmin() {
+    public void cambiarAdmin() {
 
     }
 }
