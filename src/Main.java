@@ -22,9 +22,9 @@ public class Main {
         //Declaración de Scanner
         Scanner teclado = new Scanner(System.in);
         //Declaración de variables relacionadas con el inicio y registro de sesión
-        String usuario;
-        String passwd; //(Contraseña)
-        String passwd2; //(Para la tipica verificación de "vuelva a escribir la contraseña para registrarse")
+        String usuario = "";
+        String passwd = ""; //(Contraseña)
+        String passwd2 = ""; //(Para la tipica verificación de "vuelva a escribir la contraseña para registrarse")
 
         while (opcion != 3) {
             System.out.println();
@@ -50,9 +50,25 @@ public class Main {
                 case 2:
                     System.out.println("Introduzca un nombre de usuario");
                     usuario = teclado.next();
-                    System.out.println("Introduzca una contraseña");
-                    passwd = teclado.next();
-
+                    passwd = ""; passwd2 = "";
+                    System.out.println("Introduzca una contraseña (Debe contener 6 caracteres, letras mayúsculas y minúsculas, y al menos un símbolo");
+                    //El siguiente while controla cuando las condiciones no se cumplen)
+                    while (passwd.length() < 6 || //Que tenga menos de 6 caracteres
+                            !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
+                            !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
+                            !passwd.matches(".*[^a-zA-Z\\d].*")) //Que NO contenga un símbolo
+                    {
+                        passwd = teclado.next();
+                        if (passwd.length() < 6 || //Que tenga menos de 6 caracteres
+                                !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
+                                !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
+                                !passwd.matches(".*[^a-zA-Z\\d].*")) //Que NO contenga un símbolo
+                        {
+                            System.out.println("La contraseña introducida no cumple los requisitos necesarios");
+                            System.out.println("Introduzca una contraseña");
+                        }
+                        //
+                    }
                     //Sistema de verificación de contraseña (repetirla dos veces)
                     System.out.println("Vuelva a escribir la contraseña para registrarse");
                     for (int i = 3; i > 0; i--) {   //El programa vuelve al principio una vez se agotan los intentos
