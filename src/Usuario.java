@@ -5,19 +5,13 @@ public class Usuario {
 
     //Constructor
     public Usuario(String nombreUsuario, String passwd){
-        this.idUsuario = idUsuario;
-
-        //El siguiente while controla cuando las condiciones no se cumplen)
-        boolean condicionPasswd = passwd.length() < 6 || //Que tenga menos de 6 caracteres
-                !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
-                !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
-                !passwd.matches(".*[^a-zA-Z\\d].*");
-
-        if (condicionPasswd) {
-            throw new RuntimeException("La contraseña no cumple los requisitos");
+        calcularIdUsuario();
+        if (!(comprobarContraseña(passwd))) {
+            throw new RuntimeException("La contraseña no cumple con los requisitos mínimos");
+        } else {
+            this.passwd = passwd;
         }
         this.nombreUsuario = nombreUsuario;
-        this.passwd = passwd;
 
     }
 
@@ -45,6 +39,23 @@ public class Usuario {
     public void setPasswd(String passwd) {
         this.passwd = passwd;
     }
+
+    public boolean comprobarContraseña(String passwd) {
+        if (passwd.length() < 6 || //Que tenga menos de 6 caracteres
+                !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
+                !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
+                !passwd.matches(".*[^a-zA-Z\\d].*")) {
+            return false;
+        }
+        return true;
+    }
+    public void calcularIdUsuario() {
+        if (idUsuario == -1) {
+            idUsuario = 0;
+        } else {
+            idUsuario++;
+        }
+    } //Método para asignar un id a cada grupo
 }
 
 

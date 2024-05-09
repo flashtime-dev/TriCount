@@ -75,6 +75,7 @@ public class Main {
                 //Iniciar sesión
                 case 1: logueo(); break;
                 case 2: registro(); break;
+
                 case 3:
                     System.out.println("Saliendo..."); break;
                 default:
@@ -95,23 +96,18 @@ public class Main {
 
         //Recoger datos de Usuario
         System.out.println("Introduzca su nombre de usuario");
-        usuario = teclado.next();
+        usuario = teclado.nextLine();
         System.out.println("Introduzca su contraseña");
-        passwd = teclado.next();
+        passwd = teclado.nextLine();
 
-        //#### METER SENTENCIA QUE VERIFICA QUE EL USUARIO EXISTE (Requiere el archivo) ####
-
-
-
-        teclado.close();
+        //#### METER SENTENCIA QUE COMPRUEBA SI EL USUARIO EXISTE AQUÍ ####
     }
-
 
     public static void registro() {
         //Declaración de variables relacionadas con el inicio y registro de sesión
         String usuario = "";
         String passwd = ""; //(Contraseña)
-        String passwd2 = ""; //(Para la tipica verificación de "vuelva a escribir la contraseña para registrarse")
+        String passwd2 = ""; //(Para la típica verificación de "vuelva a escribir la contraseña para registrarse")
 
         //Declaración de Scanner
         Scanner teclado = new Scanner(System.in);
@@ -122,14 +118,13 @@ public class Main {
         passwd = teclado.next();
 
         try {
-            Usuario nuevoUsuario = new Usuario(usuario, passwd);
-
             //Sistema de verificación de contraseña (repetirla dos veces)
             System.out.println("Vuelva a escribir la contraseña para registrarse");
             for (int i = 3; i > 0; i--) {   //El programa vuelve al principio una vez se agotan los intentos
                 passwd2 = teclado.next();
                 if (Objects.equals(passwd2, passwd)) {
                     //#### METER SENTENCIA QUE CREA A UN USUARIO AQUÍ ####
+                    Usuario nuevoUsuario = new Usuario(usuario, passwd);
                     System.out.println("Ha creado la cuenta " + usuario);
                     //Usuario uno = new Usuario(IDUSUARIO ,usuario, passwd);
                     break;
@@ -147,13 +142,8 @@ public class Main {
         catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
-        catch (Exception e) {
-            System.out.println("Error al crear el Usuario");
-        }
 
     }
-
-                                                    //  Menú de Grupos
 
     public static void menuGrupos() {
         //Declaración de variables
@@ -164,8 +154,8 @@ public class Main {
 
         do {
             System.out.println("Menú de Grupos");
-            System.out.println("1. Añadir Grupo");
-            System.out.println("2. Eliminar Grupo");
+            System.out.println("1. Añadir usuario a Grupo");
+            System.out.println("2. Eliminar usuario de Grupo");
             System.out.println("3. Cambiar administrador de Grupo");
             System.out.println("4. Salir del menú de Grupos");
 
@@ -185,6 +175,8 @@ public class Main {
             }
 
         } while (opcion != 4);
-    }
+
+        teclado.close();
+    }// Menú de Grupos
 
 }
