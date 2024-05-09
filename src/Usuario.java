@@ -1,14 +1,24 @@
 public class Usuario {
-    int idUsuario;
-    String nombreUsuario;
-    String passwd;
+    private int idUsuario;
+    private String nombreUsuario;
+    private String passwd;
 
     //Constructor
-    public Usuario(int idUsuario, String nombreUsuario, String passwd) {
+    public Usuario(String nombreUsuario, String passwd){
         this.idUsuario = idUsuario;
+
+        //El siguiente while controla cuando las condiciones no se cumplen)
+        boolean condicionPasswd = passwd.length() < 6 || //Que tenga menos de 6 caracteres
+                !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
+                !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
+                !passwd.matches(".*[^a-zA-Z\\d].*");
+
+        if (condicionPasswd) {
+            throw new RuntimeException("La contraseña no cumple los requisitos");
+        }
         this.nombreUsuario = nombreUsuario;
-        //passwd
         this.passwd = passwd;
+
     }
 
     //Getters y Setters
