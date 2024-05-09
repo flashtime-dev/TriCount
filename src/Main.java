@@ -10,86 +10,104 @@ public class Main {
         System.out.println("░▒█░░ ▒█░▒█ ▄█▄ ▒█▄▄█ ▒█▄▄▄█ ░▀▄▄▀ ▒█░░▀█ ░▒█░░");
         System.out.println("Todos los derechos reservados");
 
-        logueo();
+        menuPrincipal();
         System.out.println("Programa cerrado.");
 
     }
 
-    //Menú de loggeo
-    public static void logueo() {
-        //Menú logueo
+    public static void menuPrincipal(){
+        //Selector de menuPrincipal
         byte opcion = 0;
+
         //Declaración de Scanner
         Scanner teclado = new Scanner(System.in);
-        //Declaración de variables relacionadas con el inicio y registro de sesión
-        String usuario = "";
-        String passwd = ""; //(Contraseña)
-        String passwd2 = ""; //(Para la tipica verificación de "vuelva a escribir la contraseña para registrarse")
 
-        while (opcion != 3) {
+        do {
             System.out.println();
             System.out.println("Bienvenido:");
             System.out.println("1.- Iniciar Sesión");
             System.out.println("2.- Registrarse");
             System.out.println("3.- Salir");
             opcion = teclado.nextByte();
+
             switch (opcion) {
-
                 //Iniciar sesión
-                case 1:
-                    System.out.println("Introduzca su nombre de usuario");
-                    usuario = teclado.next();
-                    System.out.println("Introduzca su contraseña");
-                    passwd = teclado.next();
-
-                    //#### METER SENTENCIA QUE VERIFICA QUE EL USUARIO EXISTE (Requiere el archivo) ####
-
-                    break;
-
-                //Registrar nuevo usuario
-                case 2:
-                    System.out.println("Introduzca un nombre de usuario");
-                    usuario = teclado.next();
-                    passwd = "";
-                    passwd2 = "";
-                    System.out.println("Introduzca una contraseña (Debe contener 6 caracteres, letras mayúsculas y minúsculas, y al menos un símbolo");
-                    //El siguiente while controla cuando las condiciones no se cumplen)
-                    while (passwd.length() < 6 || //Que tenga menos de 6 caracteres
-                            !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
-                            !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
-                            !passwd.matches(".*[^a-zA-Z\\d].*")) //Que NO contenga un símbolo
-                    {
-                        passwd = teclado.next();
-                        if (passwd.length() < 6 || //Que tenga menos de 6 caracteres
-                                !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
-                                !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
-                                !passwd.matches(".*[^a-zA-Z\\d].*")) //Que NO contenga un símbolo
-                        {
-                            System.out.println("La contraseña introducida no cumple los requisitos necesarios");
-                            System.out.println("Introduzca una contraseña");
-                        }
-                        //
-                    }
-                    //Sistema de verificación de contraseña (repetirla dos veces)
-                    System.out.println("Vuelva a escribir la contraseña para registrarse");
-                    for (int i = 3; i > 0; i--) {   //El programa vuelve al principio una vez se agotan los intentos
-                        passwd2 = teclado.next();
-                        if (Objects.equals(passwd2, passwd)) {
-                            //#### METER SENTENCIA QUE CREA A UN USUARIO AQUÍ ####
-                            System.out.println("Ha creado la cuenta " + usuario);
-                            //Usuario uno = new Usuario(IDUSUARIO ,usuario, passwd);
-                            break;
-                        }
-                        else {
-                            System.out.println("La contraseña no coincide, le quedan estos intentos: " + (i-1));
-                            if ((i-1) == 0) {
-                                System.out.println("Se ha agotado el número de intentos posibles para introducir la contraseña.");
-                                System.out.println("Por favor, regístrese de nuevo.");
-                            }
-                        }
-                    }
-                    break;
+                case 1: logueo(); break;
+                case 2: registro(); break;
+                case 3:
+                    System.out.println("Saliendo..."); break;
+                default:
+                    System.out.println("Opcion no valida");
             }
+        }while (opcion!=3);
+
+        teclado.close();
+    }
+    //Menú de loggeo
+    public static void logueo() {
+        //Declaración de variables relacionadas con el inicio y registro de sesión
+        String usuario = "";
+        String passwd = ""; //(Contraseña)
+
+        //Declaración de Scanner
+        Scanner teclado = new Scanner(System.in);
+
+        //Recoger datos de Usuario
+        System.out.println("Introduzca su nombre de usuario");
+        usuario = teclado.next();
+        System.out.println("Introduzca su contraseña");
+        passwd = teclado.next();
+
+        //#### METER SENTENCIA QUE VERIFICA QUE EL USUARIO EXISTE (Requiere el archivo) ####
+
+
+
+        teclado.close();
+    }
+
+    public static void registro() {
+        //Declaración de variables relacionadas con el inicio y registro de sesión
+        String usuario = "";
+        String passwd = ""; //(Contraseña)
+        String passwd2 = ""; //(Para la tipica verificación de "vuelva a escribir la contraseña para registrarse")
+
+        //Declaración de Scanner
+        Scanner teclado = new Scanner(System.in);
+
+        System.out.println("Introduzca un nombre de usuario");
+        usuario = teclado.next();
+        System.out.println("Introduzca una contraseña (Debe contener 6 caracteres, letras mayúsculas y minúsculas, y al menos un símbolo");
+        passwd = teclado.next();
+
+        try {
+            Usuario nuevoUsuario = new Usuario(usuario, passwd);
+
+            //Sistema de verificación de contraseña (repetirla dos veces)
+            System.out.println("Vuelva a escribir la contraseña para registrarse");
+            for (int i = 3; i > 0; i--) {   //El programa vuelve al principio una vez se agotan los intentos
+                passwd2 = teclado.next();
+                if (Objects.equals(passwd2, passwd)) {
+                    //#### METER SENTENCIA QUE CREA A UN USUARIO AQUÍ ####
+                    System.out.println("Ha creado la cuenta " + usuario);
+                    //Usuario uno = new Usuario(IDUSUARIO ,usuario, passwd);
+                    break;
+                }
+                else {
+                    System.out.println("La contraseña no coincide, le quedan estos intentos: " + (i-1));
+                    if ((i-1) == 0) {
+                        System.out.println("Se ha agotado el número de intentos posibles para introducir la contraseña.");
+                        System.out.println("Por favor, regístrese de nuevo.");
+                    }
+                }
+            }
+
         }
+        catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+        }
+        catch (Exception e) {
+            System.out.println("Error al crear el Usuario");
+        }
+
     }
 }
