@@ -153,5 +153,38 @@ public class Main {
 
     }
 
+                                                    //  Menú de Grupos
+
+    public static void menuGrupos() {
+        //Declaración de variables
+        byte opcion;
+
+        //Declaración de scanner
+        Scanner teclado = new Scanner(System.in);
+
+        do {
+            System.out.println("Menú de Grupos");
+            System.out.println("1. Añadir Grupo");
+            System.out.println("2. Eliminar Grupo");
+            System.out.println("3. Cambiar administrador de Grupo");
+            System.out.println("4. Salir del menú de Grupos");
+
+            opcion = teclado.nextByte();
+            switch (opcion) {
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+
+                    break;
+                default:
+                    System.out.println("Opcion no valida");
+            }
+
+        } while (opcion != 4);
+    }
 
 }
