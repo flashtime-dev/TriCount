@@ -1,3 +1,9 @@
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -10,11 +16,46 @@ public class Main {
         System.out.println("░▒█░░ ▒█░▒█ ▄█▄ ▒█▄▄█ ▒█▄▄▄█ ░▀▄▄▀ ▒█░░▀█ ░▒█░░");
         System.out.println("Todos los derechos reservados");
 
+        //Comprobamos que los archivos existen
+        comprobarArchivos();
+
         menuPrincipal();
         System.out.println("Programa cerrado.");
 
     }
 
+    public static void comprobarArchivos(){
+        File archivoUsuarios = null;
+        File archivoGrupos = null;
+        File archivoGastos = null;
+        File archivoDivisiones = null;
+
+        //Comprobacion de los archivos
+        try {
+            archivoUsuarios = new File("usuarios.csv");
+            archivoGrupos = new File("grupos.csv");
+            archivoGastos = new File("gastos.csv");
+            archivoDivisiones = new File("divisiones.csv");
+
+            //Crear archivo en caso de que no exista
+            if (!archivoUsuarios.exists()) {
+                archivoUsuarios.createNewFile();
+            }
+            if (!archivoGrupos.exists()) {
+                archivoGrupos.createNewFile();
+            }
+            if (!archivoGastos.exists()) {
+                archivoGastos.createNewFile();
+            }
+            if (!archivoDivisiones.exists()) {
+                archivoDivisiones.createNewFile();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
     public static void menuPrincipal(){
         //Selector de menuPrincipal
         byte opcion = 0;
@@ -65,6 +106,7 @@ public class Main {
         teclado.close();
     }
 
+
     public static void registro() {
         //Declaración de variables relacionadas con el inicio y registro de sesión
         String usuario = "";
@@ -110,4 +152,6 @@ public class Main {
         }
 
     }
+
+
 }
