@@ -28,7 +28,7 @@ public class Main {
 
         while (opcion != 3) {
             System.out.println();
-            System.out.println("Vienvenido:");
+            System.out.println("Bienvenido:");
             System.out.println("1.- Iniciar Sesión");
             System.out.println("2.- Registrarse");
             System.out.println("3.- Salir");
@@ -50,7 +50,8 @@ public class Main {
                 case 2:
                     System.out.println("Introduzca un nombre de usuario");
                     usuario = teclado.next();
-                    passwd = ""; passwd2 = "";
+                    passwd = "";
+                    passwd2 = "";
                     System.out.println("Introduzca una contraseña (Debe contener 6 caracteres, letras mayúsculas y minúsculas, y al menos un símbolo");
                     //El siguiente while controla cuando las condiciones no se cumplen)
                     while (passwd.length() < 6 || //Que tenga menos de 6 caracteres

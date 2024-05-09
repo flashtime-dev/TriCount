@@ -1,14 +1,14 @@
 public class Usuario {
     int idUsuario;
     String nombreUsuario;
-    String contraseña;
+    String passwd;
 
     //Constructor
-    public Usuario(int idUsuario, String nombreUsuario, String contraseña) {
+    public Usuario(int idUsuario, String nombreUsuario, String passwd) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
         //passwd
-        this.contraseña = contraseña;
+        this.passwd = passwd;
     }
 
     //Getters y Setters
@@ -28,12 +28,12 @@ public class Usuario {
         this.nombreUsuario = nombreUsuario;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getPasswd() {
+        return passwd;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setPasswd(String passwd) {
+        this.passwd = passwd;
     }
 }
 
