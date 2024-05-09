@@ -4,8 +4,8 @@ public class Usuario {
     private String passwd;
 
     //Constructor
-    public Usuario(String nombreUsuario, String passwd){
-        calcularIdUsuario();
+    public Usuario(int idUsuario, String nombreUsuario, String passwd){
+        this.idUsuario = idUsuario;
         if (!(comprobarContraseña(passwd))) {
             throw new RuntimeException("La contraseña no cumple con los requisitos mínimos");
         } else {

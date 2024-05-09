@@ -1,11 +1,7 @@
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -101,6 +97,36 @@ public class Main {
         passwd = teclado.nextLine();
 
         //#### METER SENTENCIA QUE COMPRUEBA SI EL USUARIO EXISTE AQUÍ ####
+        //Datos del usuario a crear
+        String[] datosUsuario = new String[3];
+
+        //Lista de usuarios
+        List<Usuario> usuarios = new ArrayList<Usuario>();
+
+        //Primeros pasos de crear el archivo / y crear objetos cliente
+        try {
+            File archivo = new File("usuarios.csv");
+
+            Scanner entrada = new Scanner(archivo);
+            while (entrada.hasNextLine()) {
+                datosUsuario = entrada.nextLine().split(",");
+                usuarios.add(new Usuario(Integer.parseInt(datosUsuario[0]), datosUsuario[1],datosUsuario[2]));
+            }
+            entrada.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        boolean logueado = false;
+        for (Usuario u : usuarios) {
+            if (u.getNombreUsuario().equals(usuario) && u.getPasswd().equals(passwd)) {
+                logueado = true;
+                System.out.println("Heyyy hay que hacer el siguiente menu");
+            }
+        }
+        if (logueado == false){
+            System.out.println("Logueo Incorrecto");
+        }
     }
 
     public static void registro() {
@@ -112,38 +138,72 @@ public class Main {
         //Declaración de Scanner
         Scanner teclado = new Scanner(System.in);
 
-        System.out.println("Introduzca un nombre de usuario");
-        usuario = teclado.next();
-        System.out.println("Introduzca una contraseña (Debe contener 6 caracteres, letras mayúsculas y minúsculas, y al menos un símbolo");
-        passwd = teclado.next();
+        //Datos del usuario a crear
+        String[] datosUsuario = new String[3];
 
+        //Lista de usuarios
+        List<Usuario> usuarios = new ArrayList<Usuario>();
+
+        //Solicitar datos de usuario
+        System.out.println("Introduzca un nombre de usuario");
+        usuario = teclado.nextLine();
+        System.out.println("Introduzca una contraseña (Debe contener 6 caracteres, letras mayúsculas y minúsculas, y al menos un símbolo");
+        passwd = teclado.nextLine();
+
+        //Creacion del usuario
+        Usuario nuevoUsuario = null;
+        Usuario ultimoUsuario = null;
+        int siguienteId = 0;
+        File archivo = null;
         try {
-            //Sistema de verificación de contraseña (repetirla dos veces)
-            System.out.println("Vuelva a escribir la contraseña para registrarse");
-            for (int i = 3; i > 0; i--) {   //El programa vuelve al principio una vez se agotan los intentos
-                passwd2 = teclado.next();
-                if (Objects.equals(passwd2, passwd)) {
-                    //#### METER SENTENCIA QUE CREA A UN USUARIO AQUÍ ####
-                    Usuario nuevoUsuario = new Usuario(usuario, passwd);
-                    System.out.println("Ha creado la cuenta " + usuario);
-                    //Usuario uno = new Usuario(IDUSUARIO ,usuario, passwd);
-                    break;
-                }
-                else {
-                    System.out.println("La contraseña no coincide, le quedan estos intentos: " + (i-1));
-                    if ((i-1) == 0) {
-                        System.out.println("Se ha agotado el número de intentos posibles para introducir la contraseña.");
-                        System.out.println("Por favor, regístrese de nuevo.");
+            //Nombrar el archivo
+            archivo = new File("usuarios.csv");
+
+            Scanner entrada = new Scanner(archivo);
+
+            while (entrada.hasNextLine()) {
+                String linea = entrada.nextLine();
+                if (!linea.isEmpty()) { // Verificar si la línea no está vacía
+                    datosUsuario = linea.split(",");
+                    if (datosUsuario.length > 0) {
+                        ultimoUsuario = new Usuario(Integer.parseInt(datosUsuario[0]), datosUsuario[1], datosUsuario[2]);
+                        siguienteId = ultimoUsuario.getIdUsuario() + 1;
                     }
+                } else {
+                    siguienteId = 0;
                 }
             }
-
+            entrada.close();
+            nuevoUsuario = new Usuario(siguienteId, usuario, passwd);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+
+
+        //Introducir el usuario en el fichero usuarios.csv
+        if (nuevoUsuario!=null){
+            File archivoUsuarios = new File("usuarios.csv");
+            BufferedWriter bw = null;
+            try{
+                bw = new BufferedWriter(new FileWriter(archivoUsuarios, true));
+                //Escribimos en un String los datos del usuario (que sera una linea con los datos separados por comas)
+                String linea = nuevoUsuario.getIdUsuario()+ "," + usuario + "," + passwd;
+                bw.write(linea);
+                bw.newLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }finally {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
     }
+
+
 
     public static void menuGrupos() {
         //Declaración de variables
