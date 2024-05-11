@@ -1,17 +1,17 @@
 import java.util.TreeSet;
 
 public class Grupo {
-    private int idGrupo = -1; //Variable para asignar un id a cada grupo
+    private int idGrupo; //Variable para asignar un id a cada grupo
     private String nombreGrupo; //Nombre del grupo
     private Usuario usuarioAdmin; //Usuario administrador del grupo
     private TreeSet usuarios; //Conjunto de usuarios que pertenecen al grupo
 
     //Constructor
-    public Grupo(String nombreGrupo, Usuario usuarioAdmin, TreeSet usuarios) {
+    public Grupo(int idGrupo, String nombreGrupo, Usuario usuarioAdmin, TreeSet usuarios) {
         this.nombreGrupo = nombreGrupo;
         this.usuarioAdmin = usuarioAdmin;
         this.usuarios = usuarios;
-        calcularIdGrupo();
+        this.idGrupo = idGrupo;
     } //Fin del constructor
 
     //Getters y Setters
@@ -49,14 +49,6 @@ public class Grupo {
     } //Cambiar el conjunto de usuarios
 
     //Métodos
-    public void calcularIdGrupo() {
-        if (idGrupo == -1) {
-            idGrupo = 0;
-        } else {
-            idGrupo++;
-        }
-    } //Método para asignar un id a cada grupo
-
     public void agregarUsuario(Usuario admin, Usuario usuario) {
         if (usuarios.contains(usuario)) {
             System.out.println("El usuario ya está en el grupo");

@@ -7,6 +7,7 @@ import java.util.*;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
+        //Cabecera del programa
         System.out.println("▀▀█▀▀ ▒█▀▀█ ▀█▀ ▒█▀▀█ ▒█▀▀▀█ ▒█░▒█ ▒█▄░▒█ ▀▀█▀▀ TM");
         System.out.println("░▒█░░ ▒█▄▄▀ ▒█░ ▒█░░░ ▒█░░▒█ ▒█░▒█ ▒█▒█▒█ ░▒█░░");
         System.out.println("░▒█░░ ▒█░▒█ ▄█▄ ▒█▄▄█ ▒█▄▄▄█ ░▀▄▄▀ ▒█░░▀█ ░▒█░░");
@@ -15,6 +16,7 @@ public class Main {
         //Comprobamos que los archivos existen
         comprobarArchivos();
 
+        //Inicio del programa
         menuPrincipal();
         System.out.println("Programa cerrado.");
 
@@ -52,6 +54,7 @@ public class Main {
         }
 
     }
+
     public static void menuPrincipal(){
         //Selector de menuPrincipal
         byte opcion = 0;
@@ -60,8 +63,7 @@ public class Main {
         Scanner teclado = new Scanner(System.in);
 
         do {
-            System.out.println();
-            System.out.println("Bienvenido:");
+            System.out.println("\nMenú principal:");
             System.out.println("1.- Iniciar Sesión");
             System.out.println("2.- Registrarse");
             System.out.println("3.- Salir");
@@ -70,15 +72,13 @@ public class Main {
             switch (opcion) {
                 //Iniciar sesión
                 case 1: logueo(); break;
+                //Crear usuario (registrarse)
                 case 2: registro(); break;
-
-                case 3:
-                    System.out.println("Saliendo..."); break;
-                default:
-                    System.out.println("Opcion no valida");
+                //Salir
+                case 3: System.out.println("Saliendo..."); break;
+                default: System.out.println("Opcion no valida");
             }
         }while (opcion!=3);
-
         teclado.close();
     }
     //Menú de loggeo
@@ -121,7 +121,9 @@ public class Main {
         for (Usuario u : usuarios) {
             if (u.getNombreUsuario().equals(usuario) && u.getPasswd().equals(passwd)) {
                 logueado = true;
-                System.out.println("Heyyy hay que hacer el siguiente menu");
+                System.out.println("Logueo correcto\n\n");
+                int idUsuarioLogueado = u.getIdUsuario();
+                menuGrupos(idUsuarioLogueado);
             }
         }
         if (logueado == false){
@@ -205,7 +207,7 @@ public class Main {
 
 
 
-    public static void menuGrupos() {
+    public static void menuGrupos(int idUsuarioLogueado) {
         //Declaración de variables
         byte opcion;
 
@@ -214,29 +216,32 @@ public class Main {
 
         do {
             System.out.println("Menú de Grupos");
-            System.out.println("1. Añadir usuario a Grupo");
-            System.out.println("2. Eliminar usuario de Grupo");
-            System.out.println("3. Cambiar administrador de Grupo");
-            System.out.println("4. Salir del menú de Grupos");
+            System.out.println("1. Ver grupos");
+            System.out.println("2. Crear un grupo");
+            System.out.println("3. Eliminar un grupo");
+            System.out.println("4. Entrar a un grupo");
+            System.out.println("5. Volver al menu de principal");
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1:
-
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-
-                    break;
+                case 1: verGrupos(); break;
+                case 2: crearGrupo(); break;
+                case 3: eliminarGrupo(); break;
+                case 4: entrarGrupo(); break;
+                case 5: System.out.println("Volviendo al menú principal..."); break;
                 default:
                     System.out.println("Opcion no valida");
             }
 
-        } while (opcion != 4);
+        } while (opcion != 5);
+        //No cerrar teclado para no crear conflicto con el scanner teclado del menu anterior
+    }
 
-        teclado.close();
-    }// Menú de Grupos
+    public static void verGrupos(){}
+    public static void crearGrupo() {}
+    public static void eliminarGrupo() {}
+    public static void entrarGrupo(){}
+
+
 
 }
