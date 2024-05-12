@@ -300,9 +300,7 @@ public class Main {
         System.out.println("ID  Nombre");
         for (Grupo grupo : listaGruposArchivo()){
             if (grupo.getUsuarioAdmin().getIdUsuario() == idUsuarioLogueado) {
-                System.out.println("Borrar grupo del archivo");
-            }else {
-                System.out.println("No tienes permisos para borrar ese grupo");
+                System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
             }
         }
         System.out.println("Introduce el ID del grupo que quieres borrar:");
@@ -310,6 +308,8 @@ public class Main {
         Grupo grupo = getGrupoID(id);
         if (idUsuarioLogueado == grupo.getUsuarioAdmin().getIdUsuario()) {
             System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
+        }else {
+            System.out.println("No tienes permisos para borrar este grupo");
         }
     }
 
