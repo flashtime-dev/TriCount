@@ -1,1 +1,5 @@
 0,Vacaciones,0;[0, 1]
+1,Spa Marbella,1;[1, 2, 3]
+2,Tardeo,1;[0, 1, 2]
+3,Viaje Granada,0;[0, 2, 3]
+4,Comida,5;[0, 5]

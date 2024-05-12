@@ -1,11 +1,6 @@
 import java.io.*;
-import java.net.IDN;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
         //Cabecera del programa
@@ -224,7 +219,7 @@ public class Main {
         Scanner teclado = new Scanner(System.in);
 
         do {
-            System.out.println("Menú de Grupos");
+            System.out.println("\nMenú de Grupos");
             System.out.println("1. Ver grupos");
             System.out.println("2. Crear un grupo");
             System.out.println("3. Eliminar un grupo");
@@ -235,7 +230,7 @@ public class Main {
             switch (opcion) {
                 case 1: verGrupos(idUsuarioLogueado); break;
                 case 2: crearGrupo(idUsuarioLogueado); break;
-                case 3: eliminarGrupo(); break;
+                case 3: eliminarGrupo(idUsuarioLogueado); break;
                 case 4: entrarGrupo(); break;
                 case 5: System.out.println("Volviendo al menú principal..."); break;
                 default:
@@ -249,10 +244,9 @@ public class Main {
     //Lista de grupos
 
     public static List<Grupo> listaGruposArchivo(){
-        //Datos del usuario a crear
         String[] datosGrupo = new String[4];
         String[] datosGrupo2;
-        TreeSet usuariosGrupo = new TreeSet();
+
         String datos1 = "";
         String datos2 = "";
 
@@ -265,15 +259,17 @@ public class Main {
 
             Scanner entrada = new Scanner(archivo);
             while (entrada.hasNextLine()) {
+                TreeSet usuariosGrupo = new TreeSet();
+
                 //Separamos los datos por ; para separar la lista de usuarios del grupo
                 datosGrupo = entrada.nextLine().split(";");
                 datos1 = datosGrupo[0]; //Metesmos los datos en un string para separarlos por comas;
                 datos2 = datosGrupo[1]; //metemos los datos en un string para meterlos en un treeset
-                datos2.substring(1, datos2.length()-1); //le quitamos los corchetes
-                System.out.println(datos2);
+                datos2 = datos2.substring(1, datos2.length()-1); //le quitamos los corchetes
                 datosGrupo2 = datos2.split(",");
                 for (String usuario : datosGrupo2) {
-                    usuariosGrupo.add(Integer.parseInt(usuario));
+                    usuariosGrupo.add(Integer.parseInt(usuario.trim()));
+
                 }
 
                 Scanner entrada2 = new Scanner(datos1);
@@ -289,11 +285,34 @@ public class Main {
     }
 
     public static void verGrupos(int idUsuarioLogueado){
-        System.out.println("ID  Nombre  Integrantes");
+        System.out.println("ID  Nombre");
         for (Grupo grupo : listaGruposArchivo()){
+            TreeSet<Integer> usuariosGrupo = new TreeSet(grupo.getUsuarios());
+            if (usuariosGrupo.contains(idUsuarioLogueado)){
+                System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
+
+            }
+        }
+    }
+
+    public static void eliminarGrupo(int idUsuarioLogueado) {
+        Scanner teclado = new Scanner(System.in);
+        System.out.println("ID  Nombre");
+        for (Grupo grupo : listaGruposArchivo()){
+            if (grupo.getUsuarioAdmin().getIdUsuario() == idUsuarioLogueado) {
+                System.out.println("Borrar grupo del archivo");
+            }else {
+                System.out.println("No tienes permisos para borrar ese grupo");
+            }
+        }
+        System.out.println("Introduce el ID del grupo que quieres borrar:");
+        int id = teclado.nextInt();
+        Grupo grupo = getGrupoID(id);
+        if (idUsuarioLogueado == grupo.getUsuarioAdmin().getIdUsuario()) {
             System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
         }
     }
+
     public static void crearGrupo(int idUsuarioLogueado) {
         //Declaración de variables relacionadas
         String nombreGrupo = "";
@@ -418,7 +437,7 @@ public class Main {
         }
 
     }
-    public static void eliminarGrupo() {}
+
     public static void entrarGrupo(){}
 
     public static Usuario getUsuarioID(int idUsuario){
@@ -426,6 +445,16 @@ public class Main {
         for (Usuario usuario : usuarios) {
             if (usuario.getIdUsuario() == idUsuario) {
                 return usuario;
+            }
+        }
+        return null;
+    }
+
+    public static Grupo getGrupoID(int idGrupo){
+        List<Grupo> grupos = listaGruposArchivo();
+        for (Grupo grupo : grupos) {
+            if (grupo.getIdGrupo() == idGrupo) {
+                return grupo;
             }
         }
         return null;
