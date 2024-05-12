@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Usuario {
     private int idUsuario;
     private String nombreUsuario;
@@ -6,7 +8,7 @@ public class Usuario {
     //Constructor
     public Usuario(int idUsuario, String nombreUsuario, String passwd){
         this.idUsuario = idUsuario;
-        if (!(comprobarContraseña(passwd))) {
+        if (!(comprobarPasswd(passwd))) {
             throw new RuntimeException("La contraseña no cumple con los requisitos mínimos");
         } else {
             this.passwd = passwd;
@@ -40,7 +42,7 @@ public class Usuario {
         this.passwd = passwd;
     }
 
-    public boolean comprobarContraseña(String passwd) {
+    public boolean comprobarPasswd(String passwd) {
         if (passwd.length() < 6 || //Que tenga menos de 6 caracteres
                 !passwd.matches(".*[a-z].*") || //Que NO contenga una letra minúscula
                 !passwd.matches(".*[A-Z].*") || //Que NO contenga una letra mayúscula
@@ -49,13 +51,24 @@ public class Usuario {
         }
         return true;
     }
-    public void calcularIdUsuario() {
-        if (idUsuario == -1) {
-            idUsuario = 0;
-        } else {
-            idUsuario++;
-        }
-    } //Método para asignar un id a cada grupo
+
+    @Override
+    public String toString() {
+        return idUsuario + " - " + nombreUsuario;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return idUsuario == usuario.idUsuario;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idUsuario);
+    }
 }
 
 

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.IDN;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -81,22 +82,10 @@ public class Main {
         }while (opcion!=3);
         teclado.close();
     }
-    //Menú de loggeo
-    public static void logueo() {
-        //Declaración de variables relacionadas con el inicio y registro de sesión
-        String usuario = "";
-        String passwd = ""; //(Contraseña)
 
-        //Declaración de Scanner
-        Scanner teclado = new Scanner(System.in);
+    //Lista de usuarios
 
-        //Recoger datos de Usuario
-        System.out.println("Introduzca su nombre de usuario");
-        usuario = teclado.nextLine();
-        System.out.println("Introduzca su contraseña");
-        passwd = teclado.nextLine();
-
-        //#### METER SENTENCIA QUE COMPRUEBA SI EL USUARIO EXISTE AQUÍ ####
+    public static List<Usuario> listaUsuariosArchivo(){
         //Datos del usuario a crear
         String[] datosUsuario = new String[3];
 
@@ -117,6 +106,29 @@ public class Main {
             throw new RuntimeException(e);
         }
 
+        return usuarios;
+    }
+
+
+    //Menú de loggeo
+    public static void logueo() {
+        //Declaración de variables relacionadas con el inicio y registro de sesión
+        String usuario = "";
+        String passwd = ""; //(Contraseña)
+
+        //Declaración de Scanner
+        Scanner teclado = new Scanner(System.in);
+
+        //Recoger datos de Usuario
+        System.out.println("Introduzca su nombre de usuario");
+        usuario = teclado.nextLine();
+        System.out.println("Introduzca su contraseña");
+        passwd = teclado.nextLine();
+
+
+        //#### METER SENTENCIA QUE COMPRUEBA SI EL USUARIO EXISTE AQUÍ ####
+        List<Usuario> usuarios = new ArrayList<Usuario>(listaUsuariosArchivo());
+
         boolean logueado = false;
         for (Usuario u : usuarios) {
             if (u.getNombreUsuario().equals(usuario) && u.getPasswd().equals(passwd)) {
@@ -135,7 +147,6 @@ public class Main {
         //Declaración de variables relacionadas con el inicio y registro de sesión
         String usuario = "";
         String passwd = ""; //(Contraseña)
-        String passwd2 = ""; //(Para la típica verificación de "vuelva a escribir la contraseña para registrarse")
 
         //Declaración de Scanner
         Scanner teclado = new Scanner(System.in);
@@ -205,8 +216,6 @@ public class Main {
 
     }
 
-
-
     public static void menuGrupos(int idUsuarioLogueado) {
         //Declaración de variables
         byte opcion;
@@ -224,8 +233,8 @@ public class Main {
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1: verGrupos(); break;
-                case 2: crearGrupo(); break;
+                case 1: verGrupos(idUsuarioLogueado); break;
+                case 2: crearGrupo(idUsuarioLogueado); break;
                 case 3: eliminarGrupo(); break;
                 case 4: entrarGrupo(); break;
                 case 5: System.out.println("Volviendo al menú principal..."); break;
@@ -237,10 +246,190 @@ public class Main {
         //No cerrar teclado para no crear conflicto con el scanner teclado del menu anterior
     }
 
-    public static void verGrupos(){}
-    public static void crearGrupo() {}
+    //Lista de grupos
+
+    public static List<Grupo> listaGruposArchivo(){
+        //Datos del usuario a crear
+        String[] datosGrupo = new String[4];
+        String[] datosGrupo2;
+        TreeSet usuariosGrupo = new TreeSet();
+        String datos1 = "";
+        String datos2 = "";
+
+        //Lista de grupos
+        List<Grupo> grupos = new ArrayList<>();
+
+        //Primeros pasos de crear el archivo / y crear objetos cliente
+        try {
+            File archivo = new File("grupos.csv");
+
+            Scanner entrada = new Scanner(archivo);
+            while (entrada.hasNextLine()) {
+                //Separamos los datos por ; para separar la lista de usuarios del grupo
+                datosGrupo = entrada.nextLine().split(";");
+                datos1 = datosGrupo[0]; //Metesmos los datos en un string para separarlos por comas;
+                datos2 = datosGrupo[1]; //metemos los datos en un string para meterlos en un treeset
+                datos2.substring(1, datos2.length()-1); //le quitamos los corchetes
+                System.out.println(datos2);
+                datosGrupo2 = datos2.split(",");
+                for (String usuario : datosGrupo2) {
+                    usuariosGrupo.add(Integer.parseInt(usuario));
+                }
+
+                Scanner entrada2 = new Scanner(datos1);
+                datosGrupo = entrada2.nextLine().split(",");
+                grupos.add(new Grupo(Integer.parseInt(datosGrupo[0]), datosGrupo[1],getUsuarioID(Integer.parseInt(datosGrupo[2])), usuariosGrupo));
+            }
+            entrada.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return grupos;
+    }
+
+    public static void verGrupos(int idUsuarioLogueado){
+        System.out.println("ID  Nombre  Integrantes");
+        for (Grupo grupo : listaGruposArchivo()){
+            System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
+        }
+    }
+    public static void crearGrupo(int idUsuarioLogueado) {
+        //Declaración de variables relacionadas
+        String nombreGrupo = "";
+        int usuarioAdmin = idUsuarioLogueado;
+
+
+        //Declaración de Scanner
+        Scanner teclado = new Scanner(System.in);
+
+        //Datos del usuario a crear
+        String[] datosGrupo = new String[4];
+
+        //Lista de grupos
+        List<Grupo> grupos = new ArrayList<Grupo>();
+
+        //Solicitar datos de grupo
+        System.out.println("Introduzca un nombre para el grupo");
+        nombreGrupo = teclado.nextLine();
+
+        //Crear Usuario Admin
+        Usuario admin = getUsuarioID(usuarioAdmin);
+
+        //Crear TreeSet con los usuarios correspondientes
+        TreeSet usuariosGrupo = new TreeSet();
+        usuariosGrupo.add(admin.getIdUsuario());
+
+        //Agregar usuarios
+        System.out.println("Estos son los usuarios que existen:");
+        System.out.println("ID  Nombre");
+        for (Usuario u : listaUsuariosArchivo()){
+            System.out.println(u);
+        }
+        String respuesta = "";
+        System.out.println("Introduce el ID de un usuario al grupo:");
+        int idUsuarioGrupo = teclado.nextInt();
+
+        //Añadir usuario al grupo
+        if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))){
+            usuariosGrupo.add(idUsuarioGrupo);
+        }else {
+            System.out.println("El ID del usuario no existe");
+        }
+
+
+        do {
+            System.out.println("Quieres introducir otro usuario?");
+            teclado.nextLine();
+            respuesta = teclado.nextLine();
+            respuesta = respuesta.toLowerCase();
+
+            if (respuesta.equals("si")) {
+                System.out.println("Introduce el ID de un usuario al grupo:");
+                idUsuarioGrupo = teclado.nextInt();
+
+                //Añadir usuario al grupo
+                if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))){
+                    usuariosGrupo.add(idUsuarioGrupo);
+                }else {
+                    System.out.println("El ID del usuario no existe");
+                }
+            }
+
+            if (!respuesta.equals("si") && !respuesta.equals("no")) {
+                System.out.println("Respuesta incorrecta (escriba si o no)");
+                respuesta = "si";
+            }
+        } while (respuesta.equals("si"));
+
+
+
+
+
+        //Creacion del grupo
+        Grupo nuevoGrupo = null;
+        Grupo ultimoGrupo = null;
+        int siguienteId = 0;
+        File archivo = null;
+        try {
+            //Nombrar el archivo
+            archivo = new File("grupos.csv");
+
+            Scanner entrada = new Scanner(archivo);
+
+            while (entrada.hasNextLine()) {
+                String linea = entrada.nextLine();
+                if (!linea.isEmpty()) { // Verificar si la línea no está vacía
+                    datosGrupo = linea.split(",");
+                    if (datosGrupo.length > 0) {
+                        ultimoGrupo = new Grupo(Integer.parseInt(datosGrupo[0]), datosGrupo[1], admin, usuariosGrupo);
+                        siguienteId = ultimoGrupo.getIdGrupo() + 1;
+                    }
+                } else {
+                    siguienteId = 0;
+                }
+            }
+            entrada.close();
+            nuevoGrupo = new Grupo(siguienteId, nombreGrupo, admin, usuariosGrupo);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        //Introducir el grupo en el fichero grupos.csv
+        if (nuevoGrupo!=null){
+            File archivoGrupos = new File("grupos.csv");
+            BufferedWriter bw = null;
+            try{
+                bw = new BufferedWriter(new FileWriter(archivoGrupos, true));
+                //Escribimos en un String los datos del usuario (que sera una linea con los datos separados por comas)
+                String linea = nuevoGrupo.getIdGrupo()+ "," + nombreGrupo + "," + admin.getIdUsuario() + ";" + usuariosGrupo;
+                bw.write(linea);
+                bw.newLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
     public static void eliminarGrupo() {}
     public static void entrarGrupo(){}
+
+    public static Usuario getUsuarioID(int idUsuario){
+        List<Usuario> usuarios = listaUsuariosArchivo();
+        for (Usuario usuario : usuarios) {
+            if (usuario.getIdUsuario() == idUsuario) {
+                return usuario;
+            }
+        }
+        return null;
+    }
 
 
 

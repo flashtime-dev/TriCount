@@ -1,3 +1,5 @@
+import java.util.Objects;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class Grupo {
@@ -49,12 +51,20 @@ public class Grupo {
     } //Cambiar el conjunto de usuarios
 
     //Métodos
+    public void calcularIdGrupo() {
+        if (idGrupo == -1) {
+            idGrupo = 0;
+        } else {
+            idGrupo++;
+        }
+    } //Método para asignar un id a cada grupo
+
     public void agregarUsuario(Usuario admin, Usuario usuario) {
         if (usuarios.contains(usuario)) {
             System.out.println("El usuario ya está en el grupo");
         } else {
             if (admin.equals(this.usuarioAdmin)) {
-                usuarios.add(usuario);
+                usuarios.add(usuario.getIdUsuario());
             } else {
                 System.out.println("No tienes permisos para agregar usuarios");
             }
@@ -82,6 +92,29 @@ public class Grupo {
             System.out.println("No tienes permisos para cambiar el administrador");
         }
     } //Método para cambiar el administrador del grupo
+
+    @Override
+    public String toString() {
+        return "Grupo{" +
+                "idGrupo=" + idGrupo +
+                ", nombreGrupo='" + nombreGrupo + '\'' +
+                ", usuarioAdmin=" + usuarioAdmin +
+                ", usuarios=" + usuarios +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Grupo grupo = (Grupo) o;
+        return idGrupo == grupo.idGrupo;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idGrupo);
+    }
 }
 
 
