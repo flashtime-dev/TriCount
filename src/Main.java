@@ -308,6 +308,37 @@ public class Main {
         Grupo grupo = getGrupoID(id);
         if (idUsuarioLogueado == grupo.getUsuarioAdmin().getIdUsuario()) {
             System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
+            File archivoTemp = new File("gruposTemp.csv");
+            for (Grupo g : listaGruposArchivo()){
+                if (g!=null && g.getIdGrupo()!=id){
+                    BufferedWriter bw = null;
+                    try{
+                        TreeSet<Integer> usuariosGrupo = new TreeSet(grupo.getUsuarios());
+                        bw = new BufferedWriter(new FileWriter(archivoTemp, true));
+                        String linea = g.getIdGrupo()+ "," + g.getNombreGrupo() + "," + g.getUsuarioAdmin().getIdUsuario() + ";" + usuariosGrupo;
+                        bw.write(linea);
+                        bw.newLine();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        try {
+                            bw.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+            File archivoGrupos = new File("grupos.csv");
+            // Renombrar el archivo temporal al nombre del archivo original
+            if (!archivoGrupos.delete()) {
+                System.out.println("No se pudo eliminar el grupo");
+            }
+
+            // Renombrar el archivo temporal al nombre del archivo original
+            if (!archivoTemp.renameTo(archivoGrupos)) {
+                System.out.println("No se borrar el grupo");
+            }
         }else {
             System.out.println("No tienes permisos para borrar este grupo");
         }
