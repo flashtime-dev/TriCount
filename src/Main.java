@@ -486,7 +486,7 @@ public class Main {
             // Verificar si el usuario está en el grupo
             if (usuariosGrupo.contains(idUsuarioLogueado)) {
                 // Mostrar el menú de gastos
-                menuGastos(idUsuarioLogueado);
+                menuGastos(idUsuarioLogueado, id);
             } else {
                 // El usuario no forma parte de este grupo
                 System.out.println("El usuario no forma parte de este grupo.");
@@ -518,7 +518,7 @@ public class Main {
         return null;
     }
 
-    public static void menuGastos(int idUsuarioLogueado){
+    public static void menuGastos(int idUsuarioLogueado, int idGrupo){
         //Declaración de variables
         byte opcion;
 
@@ -537,12 +537,12 @@ public class Main {
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1:
-                case 2:
+                case 1: addGasto(); break;
+                case 2: eliminarGasto(); break;
                 case 3:
                 case 4:
-                case 5:
-                case 6:
+                case 5: verSaldo(); break;
+                case 6: dividirGastos(); break;
                 case 7: System.out.println("Volviendo al menú principal..."); break;
                 default:
                     System.out.println("Opcion no valida");
