@@ -526,7 +526,7 @@ public class Main {
         Scanner teclado = new Scanner(System.in);
 
         do {
-            System.out.println("\nMenú de Grupos");
+            System.out.println("\nMenú de Gastos");
             System.out.println("1. Añadir gasto");
             System.out.println("2. Eliminar gasto");
             System.out.println("3. Añadir usuario al grupo");
