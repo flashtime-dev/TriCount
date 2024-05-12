@@ -231,7 +231,7 @@ public class Main {
                 case 1: verGrupos(idUsuarioLogueado); break;
                 case 2: crearGrupo(idUsuarioLogueado); break;
                 case 3: eliminarGrupo(idUsuarioLogueado); break;
-                case 4: entrarGrupo(); break;
+                case 4: entrarGrupo(idUsuarioLogueado); break;
                 case 5: System.out.println("Volviendo al menú principal..."); break;
                 default:
                     System.out.println("Opcion no valida");
@@ -413,9 +413,6 @@ public class Main {
         } while (respuesta.equals("si"));
 
 
-
-
-
         //Creacion del grupo
         Grupo nuevoGrupo = null;
         Grupo ultimoGrupo = null;
@@ -469,7 +466,37 @@ public class Main {
 
     }
 
-    public static void entrarGrupo(){}
+    public static void entrarGrupo(int idUsuarioLogueado){
+        Scanner teclado = new Scanner(System.in);
+        // Imprimir grupos de los que formas parte
+        verGrupos(idUsuarioLogueado);
+
+        // Introducir id
+        System.out.println("Introduzca el ID del grupo al que quieres entrar");
+        int id = teclado.nextInt();
+
+        // Obtener el grupo a través del id
+        Grupo grupo = getGrupoID(id);
+
+        // Verificar si el grupo existe
+        if (grupo != null) {
+            // Obtener los usuarios que forman parte del grupo
+            TreeSet<Integer> usuariosGrupo = grupo.getUsuarios();
+
+            // Verificar si el usuario está en el grupo
+            if (usuariosGrupo.contains(idUsuarioLogueado)) {
+                // Mostrar el menú de gastos
+                menuGastos(idUsuarioLogueado);
+            } else {
+                // El usuario no forma parte de este grupo
+                System.out.println("El usuario no forma parte de este grupo.");
+            }
+        } else {
+            // El grupo con el ID especificado no existe
+            System.out.println("El grupo con ID " + id + " no existe.");
+        }
+
+    }
 
     public static Usuario getUsuarioID(int idUsuario){
         List<Usuario> usuarios = listaUsuariosArchivo();
@@ -491,6 +518,44 @@ public class Main {
         return null;
     }
 
+    public static void menuGastos(int idUsuarioLogueado){
+        //Declaración de variables
+        byte opcion;
+
+        //Declaración de scanner
+        Scanner teclado = new Scanner(System.in);
+
+        do {
+            System.out.println("\nMenú de Grupos");
+            System.out.println("1. Añadir gasto");
+            System.out.println("2. Eliminar gasto");
+            System.out.println("3. Añadir usuario al grupo");
+            System.out.println("4. Eliminar usuario del grupo");
+            System.out.println("5. Ver saldo");
+            System.out.println("6. Dividir gastos");
+            System.out.println("7. Volver al menu de grupos");
+
+            opcion = teclado.nextByte();
+            switch (opcion) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7: System.out.println("Volviendo al menú principal..."); break;
+                default:
+                    System.out.println("Opcion no valida");
+            }
+
+        } while (opcion != 7);
+        //No cerrar teclado para no crear conflicto con el scanner teclado del menu anterior
+    }
+
+    public static void addGasto(){}
+    public static void eliminarGasto(){}
+    public static void verSaldo(){}
+    public static void dividirGastos(){}
 
 
 }
