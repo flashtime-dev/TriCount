@@ -67,9 +67,21 @@ public class Main {
 
             switch (opcion) {
                 //Iniciar sesión
-                case 1: logueo(); break;
+                case 1:
+                    try {
+                        logueo();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
                 //Crear usuario (registrarse)
-                case 2: registro(); break;
+                case 2:
+                    try {
+                        registro();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
                 //Salir
                 case 3: System.out.println("Saliendo..."); break;
                 default: System.out.println("Opcion no valida");
@@ -103,7 +115,6 @@ public class Main {
 
         return usuarios;
     }
-
 
     //Menú de loggeo
     public static void logueo() {
@@ -298,24 +309,28 @@ public class Main {
     public static void eliminarGrupo(int idUsuarioLogueado) {
         Scanner teclado = new Scanner(System.in);
         System.out.println("ID  Nombre");
-        for (Grupo grupo : listaGruposArchivo()){
+        for (Grupo grupo : listaGruposArchivo()) {
             if (grupo.getUsuarioAdmin().getIdUsuario() == idUsuarioLogueado) {
                 System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
             }
         }
         System.out.println("Introduce el ID del grupo que quieres borrar:");
         int id = teclado.nextInt();
+        if (getGrupoID(id) == null) {
+            System.out.println("El grupo con el ID " + id + " no existe.");
+            return;
+        }
         Grupo grupo = getGrupoID(id);
         if (idUsuarioLogueado == grupo.getUsuarioAdmin().getIdUsuario()) {
             System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
             File archivoTemp = new File("gruposTemp.csv");
-            for (Grupo g : listaGruposArchivo()){
-                if (g!=null && g.getIdGrupo()!=id){
+            for (Grupo g : listaGruposArchivo()) {
+                if (g != null && g.getIdGrupo() != id) {
                     BufferedWriter bw = null;
-                    try{
+                    try {
                         TreeSet<Integer> usuariosGrupo = new TreeSet(grupo.getUsuarios());
                         bw = new BufferedWriter(new FileWriter(archivoTemp, true));
-                        String linea = g.getIdGrupo()+ "," + g.getNombreGrupo() + "," + g.getUsuarioAdmin().getIdUsuario() + ";" + usuariosGrupo;
+                        String linea = g.getIdGrupo() + "," + g.getNombreGrupo() + "," + g.getUsuarioAdmin().getIdUsuario() + ";" + usuariosGrupo;
                         bw.write(linea);
                         bw.newLine();
                     } catch (IOException e) {
@@ -339,11 +354,10 @@ public class Main {
             if (!archivoTemp.renameTo(archivoGrupos)) {
                 System.out.println("No se borrar el grupo");
             }
-        }else {
+        } else {
             System.out.println("No tienes permisos para borrar este grupo");
         }
     }
-
     public static void crearGrupo(int idUsuarioLogueado) {
         //Declaración de variables relacionadas
         String nombreGrupo = "";
@@ -539,7 +553,7 @@ public class Main {
             switch (opcion) {
                 case 1: addGasto(); break;
                 case 2: eliminarGasto(); break;
-                case 3:
+                case 3: addUsuarioGrupo(idUsuarioLogueado, idGrupo); break;
                 case 4:
                 case 5: verSaldo(); break;
                 case 6: dividirGastos(); break;
@@ -554,6 +568,36 @@ public class Main {
 
     public static void addGasto(){}
     public static void eliminarGasto(){}
+    public static void addUsuarioGrupo(int idUsuarioLogueado, int idGrupo) {
+        Scanner teclado = new Scanner(System.in);
+        Grupo grupo = getGrupoID(idGrupo);
+
+        // Obtener los usuarios que forman parte del grupo
+        TreeSet<Integer> usuariosGrupo = grupo.getUsuarios();
+
+        // Verificar si el usuario está en el grupo
+        if (usuariosGrupo.contains(idUsuarioLogueado)) {
+            // Mostrar el menú de gastos
+            System.out.println("Estos son los usuarios que puedes añadir al grupo:");
+            System.out.println("ID  Nombre");
+            for (Usuario u : listaUsuariosArchivo()) {
+                if (!usuariosGrupo.contains(u.getIdUsuario())) {
+                    System.out.println(u);
+                }
+            }
+
+            System.out.println("Introduce el ID de un usuario al grupo:");
+            int idUsuarioGrupo = teclado.nextInt();
+
+            //Añadir usuario al grupo
+            if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))) {
+                usuariosGrupo.add(idUsuarioGrupo);
+            } else {
+                System.out.println("El ID del usuario no existe");
+            }
+
+        }
+    }
     public static void verSaldo(){}
     public static void dividirGastos(){}
 
