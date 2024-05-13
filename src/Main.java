@@ -553,7 +553,7 @@ public class Main {
             opcion = teclado.nextByte();
             switch (opcion) {
                 case 1: addGasto(idUsuarioLogueado, idGrupo); break;
-                case 2: /*eliminarGasto(); */break;
+                case 2: //eliminarGasto(idUsuarioLogueado, idGrupo); break;
                 case 3: addUsuarioGrupo(idGrupo); break;
                 case 4:
                 case 5: verSaldo(); break;
@@ -585,11 +585,6 @@ public class Main {
             entrada.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-
-        System.out.println("ID  Usuario  Grupo  Concepto  Fecha  Cantidad");
-        for (Gasto gasto : gastos){
-            System.out.println(gasto.getIdGasto() + " - " + gasto.getUsuarioPagador().getNombreUsuario() + " - " + gasto.getGrupo().getNombreGrupo() + " - " + gasto.getDescripcion() + " - " + gasto.getFecha() + " - " + gasto.getMonto());
         }
 
         return gastos;
@@ -678,6 +673,7 @@ public class Main {
     }
     /**public static void eliminarGasto(int idUsuarioLogueado, int idGrupo){
         Scanner teclado = new Scanner(System.in);
+
         System.out.println("ID  Concepto  Cantidad  Fecha");
         for (Gasto gasto : listaGastosArchivo()) {
             if (gasto.getUsuarioPagador().getIdUsuario() == idUsuarioLogueado && gasto.getGrupo().getIdGrupo() == idGrupo) {
@@ -686,6 +682,7 @@ public class Main {
         }
         System.out.println("Introduce el ID del gasto que quieres borrar:");
         int id = teclado.nextInt();
+
         if (getGastoID(id) == null) {
             System.out.println("El gasto con el ID " + id + " no existe.");
             return;
@@ -693,12 +690,12 @@ public class Main {
         Gasto gasto = getGastoID(id);
         if (idUsuarioLogueado == gasto.getUsuarioPagador().getIdUsuario()) {
             System.out.println(gasto.getIdGasto() + " - " + gasto.getDescripcion() + " - " + gasto.getMonto() + " - " + gasto.getFecha());
-            File archivoTemp = new File("gastosTemp.csv");
+            File archivo = new File("gastos.csv");
+            BufferedWriter bw = null;
             for (Gasto g : listaGastosArchivo()) {
                 if (g != null && g.getIdGasto() != id) {
-                    BufferedWriter bw = null;
                     try {
-                        bw = new BufferedWriter(new FileWriter(archivoTemp, true));
+                        bw = new BufferedWriter(new FileWriter(archivo, true));
                         String linea = g.getIdGasto() + "," + g.getUsuarioPagador().getIdUsuario() + "," + g.getGrupo().getIdGrupo() + "," + g.getDescripcion() + "," + g.getFecha() + "," + g.getMonto();
                         bw.write(linea);
                         bw.newLine();
@@ -718,9 +715,21 @@ public class Main {
             if (!archivoGastos.delete()) {
                 System.out.println("No se pudo eliminar el gasto");
             }
+        } else {
+            System.out.println("No tienes permisos para borrar este gasto");
         }
     }
-     */
+*/ //ARREGLAR, NO FUNCIONA CORRECTAMENTE
+    private static Gasto getGastoID(int id) {
+        List<Gasto> gastos = listaGastosArchivo();
+        for (Gasto gasto : gastos) {
+            if (gasto.getIdGasto() == id) {
+                return gasto;
+            }
+        }
+        return null;
+    }
+
     public static void addUsuarioGrupo(int idGrupo) {
         Scanner teclado = new Scanner(System.in);
         Grupo grupo = getGrupoID(idGrupo);
@@ -748,7 +757,13 @@ public class Main {
                 System.out.println("El ID del usuario no existe");
             }
 
-    }
+            // Actualizar grupos.csv
+
+
+            // Actualizar lista de grupos
+            listaGruposArchivo();
+
+    } //ARREGLAR, NO FUNCIONA CORRECTAMENTE
     public static void verSaldo(){}
     public static void dividirGastos(){}
 
