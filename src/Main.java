@@ -1,4 +1,5 @@
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Main {
@@ -551,9 +552,9 @@ public class Main {
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1: addGasto(); break;
-                case 2: eliminarGasto(); break;
-                case 3: addUsuarioGrupo(idUsuarioLogueado, idGrupo); break;
+                case 1: addGasto(idUsuarioLogueado, idGrupo); break;
+                case 2: /*eliminarGasto(); */break;
+                case 3: addUsuarioGrupo(idGrupo); break;
                 case 4:
                 case 5: verSaldo(); break;
                 case 6: dividirGastos(); break;
@@ -566,9 +567,161 @@ public class Main {
         //No cerrar teclado para no crear conflicto con el scanner teclado del menu anterior
     }
 
-    public static void addGasto(){}
-    public static void eliminarGasto(){}
-    public static void addUsuarioGrupo(int idUsuarioLogueado, int idGrupo) {
+    public static List<Gasto> listaGastosArchivo(){
+        String[] datosGasto = new String[6]; //ID, IDUsuario, IDGrupo, Concepto, Fecha, Cantidad
+
+        //Lista de gastos
+        List<Gasto> gastos = new ArrayList<>();
+
+        //Primeros pasos de crear el archivo / y crear objetos cliente
+        try {
+            File archivo = new File("gastos.csv");
+
+            Scanner entrada = new Scanner(archivo);
+            while (entrada.hasNextLine()) {
+                datosGasto = entrada.nextLine().split(",");
+                gastos.add(new Gasto(Integer.parseInt(datosGasto[0]), getUsuarioID(Integer.parseInt(datosGasto[1])), getGrupoID(Integer.parseInt(datosGasto[2])), datosGasto[3], LocalDateTime.parse(datosGasto[4]), Double.parseDouble(datosGasto[5])));
+            }
+            entrada.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("ID  Usuario  Grupo  Concepto  Fecha  Cantidad");
+        for (Gasto gasto : gastos){
+            System.out.println(gasto.getIdGasto() + " - " + gasto.getUsuarioPagador().getNombreUsuario() + " - " + gasto.getGrupo().getNombreGrupo() + " - " + gasto.getDescripcion() + " - " + gasto.getFecha() + " - " + gasto.getMonto());
+        }
+
+        return gastos;
+    }
+    public static void addGasto(int idUsuarioLogueado, int idGrupo){
+        //Declaración de variables relacionadas
+        String concepto;
+        double cantidad;
+        LocalDateTime fecha = LocalDateTime.now();
+
+        //Declaración de Scanner
+        Scanner teclado = new Scanner(System.in);
+
+        //Crear Usuario
+        Usuario usuario = getUsuarioID(idUsuarioLogueado);
+
+        //Datos del usuario a crear
+        String[] datosGasto = new String[4];
+
+        //Lista de gastos
+        List<Gasto> gastos = new ArrayList<Gasto>();
+
+        //Solicitar datos de gasto
+        System.out.println("Introduzca un concepto para el gasto");
+        concepto = teclado.nextLine();
+        System.out.println("Introduzca una cantidad para el gasto");
+        cantidad = teclado.nextDouble();
+
+        //Crear Grupo
+        Grupo grupo = getGrupoID(idGrupo);
+
+        //Creacion del gasto
+        Gasto nuevoGasto = null;
+        Gasto ultimoGasto = null;
+        int siguienteId = 0;
+        File archivo = null;
+        try {
+            //Nombrar el archivo
+            archivo = new File("gastos.csv");
+
+            Scanner entrada = new Scanner(archivo);
+
+            while (entrada.hasNextLine()) {
+                String linea = entrada.nextLine();
+                if (!linea.isEmpty()) { // Verificar si la línea no está vacía
+                    datosGasto = linea.split(",");
+                    if (datosGasto.length > 0) {
+                        ultimoGasto = new Gasto(Integer.parseInt(datosGasto[0]), getUsuarioID(Integer.parseInt(datosGasto[1])), getGrupoID(Integer.parseInt(datosGasto[2])), datosGasto[3], LocalDateTime.parse(datosGasto[4]), Double.parseDouble(datosGasto[5]));
+                        siguienteId = ultimoGasto.getIdGasto() + 1;
+                    }
+                } else {
+                    siguienteId = 0;
+                }
+            }
+            entrada.close();
+            nuevoGasto = new Gasto(siguienteId, usuario, grupo, concepto, fecha, cantidad);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Introducir el gasto en el fichero gastos.csv
+        if (nuevoGasto!=null){
+            File archivoGastos = new File("gastos.csv");
+            BufferedWriter bw = null;
+            try{
+                bw = new BufferedWriter(new FileWriter(archivoGastos, true));
+                //Escribimos en un String los datos del usuario (que sera una linea con los datos separados por comas)
+                String linea = nuevoGasto.getIdGasto()+ "," + usuario.getIdUsuario() + "," + grupo.getIdGrupo() + "," + concepto + "," + fecha + "," + cantidad;
+                bw.write(linea);
+                bw.newLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        // Actualizar lista de gastos
+        listaGastosArchivo();
+
+
+    }
+    /**public static void eliminarGasto(int idUsuarioLogueado, int idGrupo){
+        Scanner teclado = new Scanner(System.in);
+        System.out.println("ID  Concepto  Cantidad  Fecha");
+        for (Gasto gasto : listaGastosArchivo()) {
+            if (gasto.getUsuarioPagador().getIdUsuario() == idUsuarioLogueado && gasto.getGrupo().getIdGrupo() == idGrupo) {
+                System.out.println(gasto.getIdGasto() + " - " + gasto.getDescripcion() + " - " + gasto.getMonto() + " - " + gasto.getFecha());
+            }
+        }
+        System.out.println("Introduce el ID del gasto que quieres borrar:");
+        int id = teclado.nextInt();
+        if (getGastoID(id) == null) {
+            System.out.println("El gasto con el ID " + id + " no existe.");
+            return;
+        }
+        Gasto gasto = getGastoID(id);
+        if (idUsuarioLogueado == gasto.getUsuarioPagador().getIdUsuario()) {
+            System.out.println(gasto.getIdGasto() + " - " + gasto.getDescripcion() + " - " + gasto.getMonto() + " - " + gasto.getFecha());
+            File archivoTemp = new File("gastosTemp.csv");
+            for (Gasto g : listaGastosArchivo()) {
+                if (g != null && g.getIdGasto() != id) {
+                    BufferedWriter bw = null;
+                    try {
+                        bw = new BufferedWriter(new FileWriter(archivoTemp, true));
+                        String linea = g.getIdGasto() + "," + g.getUsuarioPagador().getIdUsuario() + "," + g.getGrupo().getIdGrupo() + "," + g.getDescripcion() + "," + g.getFecha() + "," + g.getMonto();
+                        bw.write(linea);
+                        bw.newLine();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        try {
+                            bw.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+            File archivoGastos = new File("gastos.csv");
+            // Renombrar el archivo temporal al nombre del archivo original
+            if (!archivoGastos.delete()) {
+                System.out.println("No se pudo eliminar el gasto");
+            }
+        }
+    }
+     */
+    public static void addUsuarioGrupo(int idGrupo) {
         Scanner teclado = new Scanner(System.in);
         Grupo grupo = getGrupoID(idGrupo);
 
@@ -576,8 +729,7 @@ public class Main {
         TreeSet<Integer> usuariosGrupo = grupo.getUsuarios();
 
         // Verificar si el usuario está en el grupo
-        if (usuariosGrupo.contains(idUsuarioLogueado)) {
-            // Mostrar el menú de gastos
+
             System.out.println("Estos son los usuarios que puedes añadir al grupo:");
             System.out.println("ID  Nombre");
             for (Usuario u : listaUsuariosArchivo()) {
@@ -596,7 +748,6 @@ public class Main {
                 System.out.println("El ID del usuario no existe");
             }
 
-        }
     }
     public static void verSaldo(){}
     public static void dividirGastos(){}
