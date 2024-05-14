@@ -553,7 +553,7 @@ public class Main {
             opcion = teclado.nextByte();
             switch (opcion) {
                 case 1: addGasto(idUsuarioLogueado, idGrupo); break;
-                case 2: //eliminarGasto(idUsuarioLogueado, idGrupo); break;
+                case 2: eliminarGasto(idUsuarioLogueado, idGrupo); break;
                 case 3: addUsuarioGrupo(idGrupo); break;
                 case 4:
                 case 5: verSaldo(); break;
@@ -671,7 +671,7 @@ public class Main {
 
 
     }
-    /**public static void eliminarGasto(int idUsuarioLogueado, int idGrupo){
+    public static void eliminarGasto(int idUsuarioLogueado, int idGrupo) {
         Scanner teclado = new Scanner(System.in);
 
         System.out.println("ID  Concepto  Cantidad  Fecha");
@@ -691,35 +691,34 @@ public class Main {
         if (idUsuarioLogueado == gasto.getUsuarioPagador().getIdUsuario()) {
             System.out.println(gasto.getIdGasto() + " - " + gasto.getDescripcion() + " - " + gasto.getMonto() + " - " + gasto.getFecha());
             File archivo = new File("gastos.csv");
-            BufferedWriter bw = null;
-            for (Gasto g : listaGastosArchivo()) {
-                if (g != null && g.getIdGasto() != id) {
-                    try {
-                        bw = new BufferedWriter(new FileWriter(archivo, true));
-                        String linea = g.getIdGasto() + "," + g.getUsuarioPagador().getIdUsuario() + "," + g.getGrupo().getIdGrupo() + "," + g.getDescripcion() + "," + g.getFecha() + "," + g.getMonto();
+            File archivoTemp = new File("gastosTemp.csv");
+
+            try (BufferedReader br = new BufferedReader(new FileReader(archivo));
+                 BufferedWriter bw = new BufferedWriter(new FileWriter(archivoTemp))) {
+
+                String linea;
+                while ((linea = br.readLine()) != null) {
+                    String[] partes = linea.split(",");
+                    int idGasto = Integer.parseInt(partes[0]); // Suponiendo que el ID del gasto está en la primera columna
+                    if (idGasto != id) {
                         bw.write(linea);
                         bw.newLine();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    } finally {
-                        try {
-                            bw.close();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
                     }
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            File archivoGastos = new File("gastos.csv");
-            // Renombrar el archivo temporal al nombre del archivo original
-            if (!archivoGastos.delete()) {
-                System.out.println("No se pudo eliminar el gasto");
+
+// Eliminar el archivo original y renombrar el archivo temporal
+            if (!archivo.delete()) {
+                System.out.println("No se pudo eliminar el archivo original");
             }
-        } else {
-            System.out.println("No tienes permisos para borrar este gasto");
+            if (!archivoTemp.renameTo(archivo)) {
+                System.out.println("No se pudo renombrar el archivo temporal");
+            }
+
         }
     }
-*/ //ARREGLAR, NO FUNCIONA CORRECTAMENTE
     private static Gasto getGastoID(int id) {
         List<Gasto> gastos = listaGastosArchivo();
         for (Gasto gasto : gastos) {
