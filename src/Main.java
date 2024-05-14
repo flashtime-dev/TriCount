@@ -19,7 +19,7 @@ public class Main {
 
     }
 
-    public static void comprobarArchivos(){
+    public static void comprobarArchivos() {
         File archivoUsuarios = null;
         File archivoGrupos = null;
         File archivoGastos = null;
@@ -52,7 +52,7 @@ public class Main {
 
     }
 
-    public static void menuPrincipal(){
+    public static void menuPrincipal() {
         //Selector de menuPrincipal
         byte opcion = 0;
 
@@ -84,16 +84,19 @@ public class Main {
                     }
                     break;
                 //Salir
-                case 3: System.out.println("Saliendo..."); break;
-                default: System.out.println("Opcion no valida");
+                case 3:
+                    System.out.println("Saliendo...");
+                    break;
+                default:
+                    System.out.println("Opcion no valida");
             }
-        }while (opcion!=3);
+        } while (opcion != 3);
         teclado.close();
     }
 
     //Lista de usuarios
 
-    public static List<Usuario> listaUsuariosArchivo(){
+    public static List<Usuario> listaUsuariosArchivo() {
         //Datos del usuario a crear
         String[] datosUsuario = new String[3];
 
@@ -107,7 +110,7 @@ public class Main {
             Scanner entrada = new Scanner(archivo);
             while (entrada.hasNextLine()) {
                 datosUsuario = entrada.nextLine().split(",");
-                usuarios.add(new Usuario(Integer.parseInt(datosUsuario[0]), datosUsuario[1],datosUsuario[2]));
+                usuarios.add(new Usuario(Integer.parseInt(datosUsuario[0]), datosUsuario[1], datosUsuario[2]));
             }
             entrada.close();
         } catch (IOException e) {
@@ -145,7 +148,7 @@ public class Main {
                 menuGrupos(idUsuarioLogueado);
             }
         }
-        if (logueado == false){
+        if (logueado == false) {
             System.out.println("Logueo Incorrecto");
         }
     }
@@ -201,18 +204,18 @@ public class Main {
 
 
         //Introducir el usuario en el fichero usuarios.csv
-        if (nuevoUsuario!=null){
+        if (nuevoUsuario != null) {
             File archivoUsuarios = new File("usuarios.csv");
             BufferedWriter bw = null;
-            try{
+            try {
                 bw = new BufferedWriter(new FileWriter(archivoUsuarios, true));
                 //Escribimos en un String los datos del usuario (que sera una linea con los datos separados por comas)
-                String linea = nuevoUsuario.getIdUsuario()+ "," + usuario + "," + passwd;
+                String linea = nuevoUsuario.getIdUsuario() + "," + usuario + "," + passwd;
                 bw.write(linea);
                 bw.newLine();
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            }finally {
+            } finally {
                 try {
                     bw.close();
                 } catch (IOException e) {
@@ -240,11 +243,21 @@ public class Main {
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1: verGrupos(idUsuarioLogueado); break;
-                case 2: crearGrupo(idUsuarioLogueado); break;
-                case 3: eliminarGrupo(idUsuarioLogueado); break;
-                case 4: entrarGrupo(idUsuarioLogueado); break;
-                case 5: System.out.println("Volviendo al menú principal..."); break;
+                case 1:
+                    verGrupos(idUsuarioLogueado);
+                    break;
+                case 2:
+                    crearGrupo(idUsuarioLogueado);
+                    break;
+                case 3:
+                    eliminarGrupo(idUsuarioLogueado);
+                    break;
+                case 4:
+                    entrarGrupo(idUsuarioLogueado);
+                    break;
+                case 5:
+                    System.out.println("Volviendo al menú principal...");
+                    break;
                 default:
                     System.out.println("Opcion no valida");
             }
@@ -255,7 +268,7 @@ public class Main {
 
     //Lista de grupos
 
-    public static List<Grupo> listaGruposArchivo(){
+    public static List<Grupo> listaGruposArchivo() {
         String[] datosGrupo = new String[4];
         String[] datosGrupo2;
 
@@ -277,7 +290,7 @@ public class Main {
                 datosGrupo = entrada.nextLine().split(";");
                 datos1 = datosGrupo[0]; //Metesmos los datos en un string para separarlos por comas;
                 datos2 = datosGrupo[1]; //metemos los datos en un string para meterlos en un treeset
-                datos2 = datos2.substring(1, datos2.length()-1); //le quitamos los corchetes
+                datos2 = datos2.substring(1, datos2.length() - 1); //le quitamos los corchetes
                 datosGrupo2 = datos2.split(",");
                 for (String usuario : datosGrupo2) {
                     usuariosGrupo.add(Integer.parseInt(usuario.trim()));
@@ -286,7 +299,7 @@ public class Main {
 
                 Scanner entrada2 = new Scanner(datos1);
                 datosGrupo = entrada2.nextLine().split(",");
-                grupos.add(new Grupo(Integer.parseInt(datosGrupo[0]), datosGrupo[1],getUsuarioID(Integer.parseInt(datosGrupo[2])), usuariosGrupo));
+                grupos.add(new Grupo(Integer.parseInt(datosGrupo[0]), datosGrupo[1], getUsuarioID(Integer.parseInt(datosGrupo[2])), usuariosGrupo));
             }
             entrada.close();
         } catch (IOException e) {
@@ -296,11 +309,11 @@ public class Main {
         return grupos;
     }
 
-    public static void verGrupos(int idUsuarioLogueado){
+    public static void verGrupos(int idUsuarioLogueado) {
         System.out.println("ID  Nombre");
-        for (Grupo grupo : listaGruposArchivo()){
+        for (Grupo grupo : listaGruposArchivo()) {
             TreeSet<Integer> usuariosGrupo = new TreeSet(grupo.getUsuarios());
-            if (usuariosGrupo.contains(idUsuarioLogueado)){
+            if (usuariosGrupo.contains(idUsuarioLogueado)) {
                 System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
 
             }
@@ -359,6 +372,7 @@ public class Main {
             System.out.println("No tienes permisos para borrar este grupo");
         }
     }
+
     public static void crearGrupo(int idUsuarioLogueado) {
         //Declaración de variables relacionadas
         String nombreGrupo = "";
@@ -388,7 +402,7 @@ public class Main {
         //Agregar usuarios
         System.out.println("Estos son los usuarios que existen:");
         System.out.println("ID  Nombre");
-        for (Usuario u : listaUsuariosArchivo()){
+        for (Usuario u : listaUsuariosArchivo()) {
             System.out.println(u);
         }
         String respuesta = "";
@@ -396,9 +410,9 @@ public class Main {
         int idUsuarioGrupo = teclado.nextInt();
 
         //Añadir usuario al grupo
-        if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))){
+        if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))) {
             usuariosGrupo.add(idUsuarioGrupo);
-        }else {
+        } else {
             System.out.println("El ID del usuario no existe");
         }
 
@@ -414,9 +428,9 @@ public class Main {
                 idUsuarioGrupo = teclado.nextInt();
 
                 //Añadir usuario al grupo
-                if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))){
+                if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))) {
                     usuariosGrupo.add(idUsuarioGrupo);
-                }else {
+                } else {
                     System.out.println("El ID del usuario no existe");
                 }
             }
@@ -459,13 +473,13 @@ public class Main {
 
 
         //Introducir el grupo en el fichero grupos.csv
-        if (nuevoGrupo!=null){
+        if (nuevoGrupo != null) {
             File archivoGrupos = new File("grupos.csv");
             BufferedWriter bw = null;
-            try{
+            try {
                 bw = new BufferedWriter(new FileWriter(archivoGrupos, true));
                 //Escribimos en un String los datos del usuario (que sera una linea con los datos separados por comas)
-                String linea = nuevoGrupo.getIdGrupo()+ "," + nombreGrupo + "," + admin.getIdUsuario() + ";" + usuariosGrupo;
+                String linea = nuevoGrupo.getIdGrupo() + "," + nombreGrupo + "," + admin.getIdUsuario() + ";" + usuariosGrupo;
                 bw.write(linea);
                 bw.newLine();
             } catch (IOException e) {
@@ -481,7 +495,7 @@ public class Main {
 
     }
 
-    public static void entrarGrupo(int idUsuarioLogueado){
+    public static void entrarGrupo(int idUsuarioLogueado) {
         Scanner teclado = new Scanner(System.in);
         // Imprimir grupos de los que formas parte
         verGrupos(idUsuarioLogueado);
@@ -513,7 +527,7 @@ public class Main {
 
     }
 
-    public static Usuario getUsuarioID(int idUsuario){
+    public static Usuario getUsuarioID(int idUsuario) {
         List<Usuario> usuarios = listaUsuariosArchivo();
         for (Usuario usuario : usuarios) {
             if (usuario.getIdUsuario() == idUsuario) {
@@ -523,7 +537,7 @@ public class Main {
         return null;
     }
 
-    public static Grupo getGrupoID(int idGrupo){
+    public static Grupo getGrupoID(int idGrupo) {
         List<Grupo> grupos = listaGruposArchivo();
         for (Grupo grupo : grupos) {
             if (grupo.getIdGrupo() == idGrupo) {
@@ -533,7 +547,7 @@ public class Main {
         return null;
     }
 
-    public static void menuGastos(int idUsuarioLogueado, int idGrupo){
+    public static void menuGastos(int idUsuarioLogueado, int idGrupo) {
         //Declaración de variables
         byte opcion;
 
@@ -548,26 +562,52 @@ public class Main {
             System.out.println("4. Eliminar usuario del grupo");
             System.out.println("5. Ver saldo");
             System.out.println("6. Dividir gastos");
-            System.out.println("7. Volver al menu de grupos");
+            System.out.println("7. Mostrar usuarios del grupo");
+            System.out.println("8. Volver al menu de grupos");
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1: addGasto(idUsuarioLogueado, idGrupo); break;
-                case 2: eliminarGasto(idUsuarioLogueado, idGrupo); listaGastosArchivo(); break;
-                case 3: addUsuarioGrupo(idGrupo); break;
+                case 1:
+                    addGasto(idUsuarioLogueado, idGrupo);
+                    break;
+                case 2:
+                    eliminarGasto(idUsuarioLogueado, idGrupo);
+                    break;
+                case 3:
+                    addUsuarioGrupo(idGrupo);
+                    break;
                 case 4:
-                case 5: verSaldo(); break;
-                case 6: dividirGastos(); break;
-                case 7: System.out.println("Volviendo al menú principal..."); break;
+                case 5:
+                    verSaldo();
+                    break;
+                case 6:
+                    dividirGastos();
+                    break;
+                case 7:
+                    mostrarUsuarios(idGrupo);
+                    break;
+                case 8:
+                    System.out.println("Volviendo al menú principal...");
+                    break;
                 default:
                     System.out.println("Opcion no valida");
             }
 
-        } while (opcion != 7);
+        } while (opcion != 8);
         //No cerrar teclado para no crear conflicto con el scanner teclado del menu anterior
     }
 
-    public static List<Gasto> listaGastosArchivo(){
+    public static void mostrarUsuarios(int idGrupo) {
+        Grupo grupo = getGrupoID(idGrupo);
+        TreeSet<Integer> usuariosGrupo = grupo.getUsuarios();
+        System.out.println("ID  Nombre");
+        for (Integer idUsuario : usuariosGrupo) {
+            Usuario usuario = getUsuarioID(idUsuario);
+            System.out.println(usuario.getIdUsuario() + " - " + usuario.getNombreUsuario());
+        }
+    }
+
+    public static List<Gasto> listaGastosArchivo() {
         String[] datosGasto = new String[6]; //ID, IDUsuario, IDGrupo, Concepto, Fecha, Cantidad
 
         //Lista de gastos
@@ -589,7 +629,8 @@ public class Main {
 
         return gastos;
     }
-    public static void addGasto(int idUsuarioLogueado, int idGrupo){
+
+    public static void addGasto(int idUsuarioLogueado, int idGrupo) {
         //Declaración de variables relacionadas
         String concepto;
         double cantidad;
@@ -646,13 +687,13 @@ public class Main {
         }
 
         //Introducir el gasto en el fichero gastos.csv
-        if (nuevoGasto!=null){
+        if (nuevoGasto != null) {
             File archivoGastos = new File("gastos.csv");
             BufferedWriter bw = null;
-            try{
+            try {
                 bw = new BufferedWriter(new FileWriter(archivoGastos, true));
                 //Escribimos en un String los datos del usuario (que sera una linea con los datos separados por comas)
-                String linea = nuevoGasto.getIdGasto()+ "," + usuario.getIdUsuario() + "," + grupo.getIdGrupo() + "," + concepto + "," + fecha + "," + cantidad;
+                String linea = nuevoGasto.getIdGasto() + "," + usuario.getIdUsuario() + "," + grupo.getIdGrupo() + "," + concepto + "," + fecha + "," + cantidad;
                 bw.write(linea);
                 bw.newLine();
             } catch (IOException e) {
@@ -671,6 +712,7 @@ public class Main {
 
 
     }
+
     public static void eliminarGasto(int idUsuarioLogueado, int idGrupo) {
         Scanner teclado = new Scanner(System.in);
 
@@ -722,6 +764,7 @@ public class Main {
         listaGastosArchivo();
 
     }
+
     private static Gasto getGastoID(int id) {
         List<Gasto> gastos = listaGastosArchivo();
         for (Gasto gasto : gastos) {
@@ -740,32 +783,27 @@ public class Main {
         TreeSet<Integer> usuariosGrupo = grupo.getUsuarios();
 
         // Verificar si el usuario está en el grupo
-
-            System.out.println("Estos son los usuarios que puedes añadir al grupo:");
-            System.out.println("ID  Nombre");
-            for (Usuario u : listaUsuariosArchivo()) {
-                if (!usuariosGrupo.contains(u.getIdUsuario())) {
-                    System.out.println(u);
-                }
+        System.out.println("Estos son los usuarios que puedes añadir al grupo:");
+        System.out.println("ID  Nombre");
+        for (Usuario u : listaUsuariosArchivo()) {
+            if (!usuariosGrupo.contains(u.getIdUsuario())) {
+                System.out.println(u.getIdUsuario() + "  " + u.getNombreUsuario());
             }
+        }
 
-            System.out.println("Introduce el ID de un usuario al grupo:");
-            int idUsuarioGrupo = teclado.nextInt();
+        System.out.println("Introduce el ID de un usuario para añadir al grupo:");
+        int idUsuarioGrupo = teclado.nextInt();
 
-            //Añadir usuario al grupo
-            if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo))) {
-                usuariosGrupo.add(idUsuarioGrupo);
-            } else {
-                System.out.println("El ID del usuario no existe");
-            }
-
-            // Actualizar grupos.csv
-
-
-            // Actualizar lista de grupos
-            listaGruposArchivo();
-
+        // Añadir usuario al grupo
+        if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo)) && !usuariosGrupo.contains(idUsuarioGrupo)) {
+            usuariosGrupo.add(idUsuarioGrupo);
+            grupo.setUsuarios(usuariosGrupo); // Actualizar el conjunto de usuarios del grupo
+            System.out.println("Usuario añadido al grupo correctamente.");
+        } else {
+            System.out.println("El ID del usuario no existe o ya está en el grupo");
+        }
     } //ARREGLAR, NO FUNCIONA CORRECTAMENTE
+
     public static void verSaldo(){}
     public static void dividirGastos(){}
 
