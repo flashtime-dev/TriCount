@@ -553,7 +553,7 @@ public class Main {
             opcion = teclado.nextByte();
             switch (opcion) {
                 case 1: addGasto(idUsuarioLogueado, idGrupo); break;
-                case 2: eliminarGasto(idUsuarioLogueado, idGrupo); break;
+                case 2: eliminarGasto(idUsuarioLogueado, idGrupo); listaGastosArchivo(); break;
                 case 3: addUsuarioGrupo(idGrupo); break;
                 case 4:
                 case 5: verSaldo(); break;
@@ -709,15 +709,18 @@ public class Main {
                 throw new RuntimeException(e);
             }
 
-// Eliminar el archivo original y renombrar el archivo temporal
+            // Eliminar el archivo original y renombrar el archivo temporal
             if (!archivo.delete()) {
                 System.out.println("No se pudo eliminar el archivo original");
             }
             if (!archivoTemp.renameTo(archivo)) {
                 System.out.println("No se pudo renombrar el archivo temporal");
             }
-
         }
+
+        // Actualizar lista de gastos
+        listaGastosArchivo();
+
     }
     private static Gasto getGastoID(int id) {
         List<Gasto> gastos = listaGastosArchivo();
