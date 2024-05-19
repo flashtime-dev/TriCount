@@ -145,7 +145,7 @@ public class Main {
         for (Usuario u : usuarios) {
             if (u.getNombreUsuario().equals(usuario) && u.getPasswd().equals(passwd)) {
                 logueado = true;
-                System.out.println("Logueo correcto\n\n");
+                System.out.println("Logueo correcto\n");
                 int idUsuarioLogueado = u.getIdUsuario();
                 menuGrupos(idUsuarioLogueado);
             }
@@ -562,23 +562,21 @@ public class Main {
             System.out.println("2. Añadir gasto");
             System.out.println("3. Eliminar gasto");
             System.out.println("4. Añadir usuario al grupo");
-            System.out.println("5. Eliminar usuario del grupo");
-            System.out.println("6. Ver saldo");
-            System.out.println("7. Cierre de gastos");
-            System.out.println("8. Mostrar usuarios del grupo");
-            System.out.println("9. Volver al menu de grupos");
+            System.out.println("5. Ver saldo");
+            System.out.println("6. Cierre de gastos");
+            System.out.println("7. Mostrar usuarios del grupo");
+            System.out.println("8. Volver al menu de grupos");
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1: verGrupos(idGrupo); break;
+                case 1: verGastos(idGrupo); break;
                 case 2: addGasto(idUsuarioLogueado, idGrupo); break;
                 case 3: eliminarGasto(idUsuarioLogueado, idGrupo); break;
                 case 4: addUsuarioGrupo(idGrupo); break;
-                case 5:
-                case 6: verSaldo(idGrupo); break;
-                case 7: cierreGastos(idGrupo); break;
-                case 8: mostrarUsuarios(idGrupo); break;
-                case 9: System.out.println("Volviendo al menú principal..."); break;
+                case 5: verSaldo(idGrupo); break;
+                case 6: cierreGastos(idGrupo); break;
+                case 7: mostrarUsuarios(idGrupo); break;
+                case 8: System.out.println("Volviendo al menú principal..."); break;
                 default:
                     System.out.println("Opcion no valida");
             }
@@ -643,6 +641,13 @@ public class Main {
         concepto = teclado.nextLine();
         System.out.println("Introduzca una cantidad para el gasto");
         cantidad = teclado.nextDouble();
+        ///MOSTRAR LISTA DE USUARIOS DEL GRUPO
+
+        // PEDIR EL ID DEL USUARIO QUE HA PAGADO EL GASTO
+        //COMPROBAR QUE EL ID EXISTE EN LA LISTA DE USUARIOS DEL GRUPO
+        //SI TODO ESTA BIEN INTRODUCIR ESE ID COMO USUARIO PAGADOR
+
+
 
         //Crear Grupo
         Grupo grupo = getGrupoID(idGrupo);
@@ -698,8 +703,7 @@ public class Main {
             dividirGastos(idUsuarioLogueado, nuevoGasto);
         }
 
-        // Actualizar lista de gastos
-        listaGastosArchivo();
+        //listaGastosArchivo();
     }
 
     private static Division_Gastos getDivisionID(int id) {
@@ -757,19 +761,17 @@ public class Main {
 
         File archivo = new File("divisiones.csv");
         List<Integer> usuarios = new ArrayList<>(nuevoGasto.getGrupo().getUsuarios());
-        System.out.println(usuarios);
+
         usuarios.forEach(usuarioDebedor -> {
             int currentIdDivision = idDivision.getAndIncrement(); // Obtener el valor actual y luego incrementarlo
 
             String linea = currentIdDivision + "," + idGasto + "," + idUsuarioPagador + "," + usuarioDebedor + ",";
-            System.out.println(linea);
+
             if (usuarioDebedor == idUsuarioPagador) {
                 linea += (monto - divisionMonto) + ",0.0";
             } else {
                 linea += "0.0," + divisionMonto;
             }
-
-            System.out.println("Prueba2");
 
             BufferedWriter bw = null;
             try {
@@ -842,8 +844,10 @@ public class Main {
             }
         }
 
+        //AQUI HAY QUE BORRAR AL IGUAL QUE EL GASTO LAS LINEAS DE DIVISION DE GASTO QUE COINCIDAN CON EL ID DE GASTO
+
         // Actualizar lista de gastos
-        listaGastosArchivo();
+        //listaGastosArchivo();
 
     }
 
@@ -880,6 +884,10 @@ public class Main {
         if (listaUsuariosArchivo().contains(getUsuarioID(idUsuarioGrupo)) && !usuariosGrupo.contains(idUsuarioGrupo)) {
             usuariosGrupo.add(idUsuarioGrupo);
             grupo.setUsuarios(usuariosGrupo); // Actualizar el conjunto de usuarios del grupo
+
+            ///AQUI TE FALTA ACTUALIZAR EL ARCHIVO HACIENDO UN ARCHIVO TEMPORAL Y LUEGO CAMBIANDOLE EL NOMBRE
+
+            ////
             System.out.println("Usuario añadido al grupo correctamente.");
         } else {
             System.out.println("El ID del usuario no existe o ya está en el grupo");
