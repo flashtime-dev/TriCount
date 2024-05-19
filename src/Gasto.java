@@ -68,4 +68,16 @@ public class Gasto {
     public void setMonto(double monto) {
         this.monto = monto;
     } //Establecer el monto del gasto
+
+    @Override
+    public String toString() {
+        return "Gasto{" +
+                "idGasto=" + idGasto +
+                ", usuarioPagador=" + usuarioPagador +
+                ", grupo=" + grupo +
+                ", descripcion='" + descripcion + '\'' +
+                ", fecha=" + fecha +
+                ", monto=" + monto +
+                '}';
+    }
 }

@@ -67,5 +67,15 @@ public class Division_Gastos {
         this.montoDebido = montoDebido;
     } //Cambiar el monto debido
 
-
+    @Override
+    public String toString() {
+        return "Division_Gastos{" +
+                "idDivision=" + idDivision +
+                ", gasto=" + gasto +
+                ", usuarioPagador=" + usuarioPagador +
+                ", usuarioDebedor=" + usuarioDebedor +
+                ", montoPagado=" + montoPagado +
+                ", montoDebido=" + montoDebido +
+                '}';
+    }
 }

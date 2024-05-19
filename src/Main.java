@@ -1,6 +1,8 @@
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -556,39 +558,27 @@ public class Main {
 
         do {
             System.out.println("\nMenú de Gastos");
-            System.out.println("1. Añadir gasto");
-            System.out.println("2. Eliminar gasto");
-            System.out.println("3. Añadir usuario al grupo");
-            System.out.println("4. Eliminar usuario del grupo");
-            System.out.println("5. Ver saldo");
-            System.out.println("6. Dividir gastos");
-            System.out.println("7. Mostrar usuarios del grupo");
-            System.out.println("8. Volver al menu de grupos");
+            System.out.println("1. Ver gastos");
+            System.out.println("2. Añadir gasto");
+            System.out.println("3. Eliminar gasto");
+            System.out.println("4. Añadir usuario al grupo");
+            System.out.println("5. Eliminar usuario del grupo");
+            System.out.println("6. Ver saldo");
+            System.out.println("7. Cierre de gastos");
+            System.out.println("8. Mostrar usuarios del grupo");
+            System.out.println("9. Volver al menu de grupos");
 
             opcion = teclado.nextByte();
             switch (opcion) {
-                case 1:
-                    addGasto(idUsuarioLogueado, idGrupo);
-                    break;
-                case 2:
-                    eliminarGasto(idUsuarioLogueado, idGrupo);
-                    break;
-                case 3:
-                    addUsuarioGrupo(idGrupo);
-                    break;
-                case 4:
+                case 1: verGrupos(idGrupo); break;
+                case 2: addGasto(idUsuarioLogueado, idGrupo); break;
+                case 3: eliminarGasto(idUsuarioLogueado, idGrupo); break;
+                case 4: addUsuarioGrupo(idGrupo); break;
                 case 5:
-                    verSaldo();
-                    break;
-                case 6:
-                    dividirGastos();
-                    break;
-                case 7:
-                    mostrarUsuarios(idGrupo);
-                    break;
-                case 8:
-                    System.out.println("Volviendo al menú principal...");
-                    break;
+                case 6: verSaldo(idGrupo); break;
+                case 7: cierreGastos(idGrupo); break;
+                case 8: mostrarUsuarios(idGrupo); break;
+                case 9: System.out.println("Volviendo al menú principal..."); break;
                 default:
                     System.out.println("Opcion no valida");
             }
@@ -642,7 +632,7 @@ public class Main {
         //Crear Usuario
         Usuario usuario = getUsuarioID(idUsuarioLogueado);
 
-        //Datos del usuario a crear
+        //Datos del gasto a crear
         String[] datosGasto = new String[4];
 
         //Lista de gastos
@@ -680,8 +670,8 @@ public class Main {
                     siguienteId = 0;
                 }
             }
-            entrada.close();
             nuevoGasto = new Gasto(siguienteId, usuario, grupo, concepto, fecha, cantidad);
+            entrada.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -705,23 +695,115 @@ public class Main {
                     throw new RuntimeException(e);
                 }
             }
+            dividirGastos(idUsuarioLogueado, nuevoGasto);
         }
 
         // Actualizar lista de gastos
         listaGastosArchivo();
+    }
+
+    private static Division_Gastos getDivisionID(int id) {
+        List<Division_Gastos> divisiones = listaDivisionArchivo();
+        for (Division_Gastos division : divisiones) {
+            if (division.getIdDivision() == id) {
+                return division;
+            }
+        }
+        return null;
+    }
+
+    public static List<Division_Gastos> listaDivisionArchivo() {
+        String[] datosDivision = new String[6];
+
+        //Lista de gastos
+        List<Division_Gastos> division = new ArrayList<>();
+
+        //Primeros pasos de crear el archivo / y crear objetos cliente
+        try {
+            File archivo = new File("divisiones.csv");
+
+            Scanner entrada = new Scanner(archivo);
+            while (entrada.hasNextLine()) {
+                datosDivision = entrada.nextLine().split(",");
+                division.add(new Division_Gastos(Integer.parseInt(datosDivision[0]), getGastoID(Integer.parseInt(datosDivision[1])), getUsuarioID(Integer.parseInt(datosDivision[2])), getUsuarioID(Integer.parseInt(datosDivision[3])), Double.parseDouble(datosDivision[4]) ,Double.parseDouble(datosDivision[5])));
+            }
+            entrada.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return division;
+    }
+
+    public static void dividirGastos(int idUsuarioLogueado, Gasto nuevoGasto) {
+        // Variables
+        AtomicInteger idDivision = new AtomicInteger();
+        int idGasto = nuevoGasto.getIdGasto();
+        int idUsuarioPagador = nuevoGasto.getUsuarioPagador().getIdUsuario();
+        int nUsuarios = (int) nuevoGasto.getGrupo().getUsuarios().stream().count();
+        double monto = nuevoGasto.getMonto();
+        double divisionMonto = monto / nUsuarios;
+
+        List<Division_Gastos> listaDivision = listaDivisionArchivo();
+
+        // Obtiene el último elemento de la lista si existe
+        if (!listaDivision.isEmpty()) {
+            idDivision.set(listaDivision.get(listaDivision.size() - 1).getIdDivision() + 1);
+        }
+
+        // Datos de la division a crear
+        String[] datosDivision = new String[4];
+
+        // Calcula el nuevo idDivision basado en el último idDivision encontrado, incrementándolo en 1
+
+        File archivo = new File("divisiones.csv");
+        List<Integer> usuarios = new ArrayList<>(nuevoGasto.getGrupo().getUsuarios());
+        System.out.println(usuarios);
+        usuarios.forEach(usuarioDebedor -> {
+            int currentIdDivision = idDivision.getAndIncrement(); // Obtener el valor actual y luego incrementarlo
+
+            String linea = currentIdDivision + "," + idGasto + "," + idUsuarioPagador + "," + usuarioDebedor + ",";
+            System.out.println(linea);
+            if (usuarioDebedor == idUsuarioPagador) {
+                linea += (monto - divisionMonto) + ",0.0";
+            } else {
+                linea += "0.0," + divisionMonto;
+            }
+
+            System.out.println("Prueba2");
+
+            BufferedWriter bw = null;
+            try {
+                bw = new BufferedWriter(new FileWriter(archivo, true));
+                bw.write(linea);
+                bw.newLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    if (bw != null) {
+                        bw.close();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
 
 
+    public static void verGastos(int idGrupo){
+        System.out.println("ID  Concepto  Cantidad  Fecha");
+        for (Gasto gasto : listaGastosArchivo()) {
+            if (gasto.getGrupo().getIdGrupo() == idGrupo) {
+                System.out.println(gasto.getIdGasto() + " - " + gasto.getDescripcion() + " - " + gasto.getMonto() + " - " + gasto.getFecha());
+            }
+        }
     }
 
     public static void eliminarGasto(int idUsuarioLogueado, int idGrupo) {
         Scanner teclado = new Scanner(System.in);
+        verGastos(idGrupo);
 
-        System.out.println("ID  Concepto  Cantidad  Fecha");
-        for (Gasto gasto : listaGastosArchivo()) {
-            if (gasto.getUsuarioPagador().getIdUsuario() == idUsuarioLogueado && gasto.getGrupo().getIdGrupo() == idGrupo) {
-                System.out.println(gasto.getIdGasto() + " - " + gasto.getDescripcion() + " - " + gasto.getMonto() + " - " + gasto.getFecha());
-            }
-        }
         System.out.println("Introduce el ID del gasto que quieres borrar:");
         int id = teclado.nextInt();
 
@@ -804,8 +886,103 @@ public class Main {
         }
     } //ARREGLAR, NO FUNCIONA CORRECTAMENTE
 
-    public static void verSaldo(){}
-    public static void dividirGastos(){}
+    public static void verSaldo(int idGrupo){
+        System.out.println("La media de gastos es:" + mediaGastosGrupo(idGrupo));
+
+        List<Integer> usuariosGrupo = getGrupoID(idGrupo).getUsuarios().stream().toList();
+        usuariosGrupo.forEach(usuario -> {
+            System.out.printf("%-10s %.2f €%n", getUsuarioID(usuario).getNombreUsuario() , saldoIDUsuario(idGrupo, usuario));
+        });
+
+    }
+
+    public static double saldoIDUsuario(int idGrupo, int idUsuario){
+        List<Division_Gastos> divisionesGrupoUsuario = listaDivisionArchivo().stream()
+                .filter(divisionGastos -> divisionGastos.getGasto().getGrupo().getIdGrupo() == idGrupo)
+                .filter(divisionGastos -> divisionGastos.getUsuarioDebedor().getIdUsuario() == idUsuario)
+                .collect(Collectors.toList());
+
+        double sumaDebido = divisionesGrupoUsuario.stream()
+                .mapToDouble(Division_Gastos::getMontoDebido)
+                .sum();
+
+        double sumaPagado = divisionesGrupoUsuario.stream()
+                .mapToDouble(Division_Gastos::getMontoPagado)
+                .sum();
+
+        return -(sumaDebido)+sumaPagado;
+
+    }
+
+    public static double mediaGastosGrupo(int idGrupo){
+        List<Gasto> gastosGrupo = listaGastosArchivo().stream()
+                .filter(gasto -> gasto.getGrupo().getIdGrupo() == idGrupo)
+                .collect(Collectors.toList());
+
+        double media = gastosGrupo.stream()
+                .mapToDouble(Gasto::getMonto)
+                .average()
+                .orElse(0.0);
+
+        return media;
+    }
+
+    public static void cierreGastos(int idGrupo){
+        Map<Usuario,Double> cierre = saldoUsuarios(idGrupo);
+
+        // Calcular la suma de los valores absolutos del mapa
+        //lo hacemos con valores absolutos para quitar el signo y asi coja los ultimos valores en el bucle
+        double sumaValores = cierre.values().stream().mapToDouble(Math::abs).sum();
+
+        Optional<Map.Entry<Usuario, Double>> max = cierre.entrySet().stream()
+                .max(Map.Entry.comparingByValue());
+
+        Optional<Map.Entry<Usuario, Double>> min = cierre.entrySet().stream()
+                .min(Map.Entry.comparingByValue());
+
+        // Ejecutar el código mientras la suma de los valores no sea cero
+        while (sumaValores != 0) {
+            String nombreMin = min.get().getKey().getNombreUsuario();
+            String nombreMax = max.get().getKey().getNombreUsuario();
+            double saldoMin = min.get().getValue();
+            double saldoMax = max.get().getValue();
+            // Calcular la cantidad a transferir
+            double montoTransferido = Math.min(Math.abs(saldoMin), Math.abs(saldoMax));
+
+            // Determinar las actualizaciones de saldo dependiendo de los signos de los saldos
+            if (saldoMin < 0 && saldoMax > 0) {
+                cierre.put(min.get().getKey(), saldoMin + montoTransferido); // Saldo mínimo incrementado
+                cierre.put(max.get().getKey(), saldoMax - montoTransferido); // Saldo máximo decrementado
+            } else if (saldoMin > 0 && saldoMax < 0) {
+                cierre.put(min.get().getKey(), saldoMin - montoTransferido); // Saldo mínimo decrementado
+                cierre.put(max.get().getKey(), saldoMax + montoTransferido); // Saldo máximo incrementado
+            }
+
+            System.out.printf("%s le debe %.2f a %s%n", nombreMin, montoTransferido, nombreMax);
+
+            // Actualizar la suma de los valores del mapa después de ejecutar tu código
+            sumaValores = cierre.values().stream().mapToDouble(Math::abs).sum();
+            min = cierre.entrySet().stream().min(Map.Entry.comparingByValue());
+            max = cierre.entrySet().stream().max(Map.Entry.comparingByValue());
+
+            // Salir del bucle si la suma de los valores es cero o muy cercana a cero
+            if (Math.abs(sumaValores) < 0.000001) {
+                break;
+            }
+        }
+
+
+    }
+
+    public static Map<Usuario, Double> saldoUsuarios(int idGrupo){
+        List<Integer> usuariosGrupo = getGrupoID(idGrupo).getUsuarios().stream().toList();
+        Map<Usuario, Double> saldoUsuarios = usuariosGrupo.stream()
+                .collect(Collectors.toMap(
+                        usuario -> getUsuarioID(usuario),
+                        usuario -> saldoIDUsuario(idGrupo, usuario)
+                ));
+        return saldoUsuarios;
+    }
 
 
 }
