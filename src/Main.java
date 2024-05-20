@@ -641,11 +641,14 @@ public class Main {
         concepto = teclado.nextLine();
         System.out.println("Introduzca una cantidad para el gasto");
         cantidad = teclado.nextDouble();
-        ///MOSTRAR LISTA DE USUARIOS DEL GRUPO
+        System.out.println("Introduce el ID del usuario que ha pagado el gasto:");
+        int idUsuarioPagador = teclado.nextInt();
 
-        // PEDIR EL ID DEL USUARIO QUE HA PAGADO EL GASTO
-        //COMPROBAR QUE EL ID EXISTE EN LA LISTA DE USUARIOS DEL GRUPO
-        //SI TODO ESTA BIEN INTRODUCIR ESE ID COMO USUARIO PAGADOR
+        // Verificar si el usuario pertenece al grupo
+        if (!getGrupoID(idGrupo).getUsuarios().contains(idUsuarioPagador)) {
+            System.out.println("El usuario con el ID " + idUsuarioPagador + " no pertenece al grupo.");
+            return;
+        }
 
 
 
@@ -668,7 +671,7 @@ public class Main {
                 if (!linea.isEmpty()) { // Verificar si la línea no está vacía
                     datosGasto = linea.split(",");
                     if (datosGasto.length > 0) {
-                        ultimoGasto = new Gasto(Integer.parseInt(datosGasto[0]), getUsuarioID(Integer.parseInt(datosGasto[1])), getGrupoID(Integer.parseInt(datosGasto[2])), datosGasto[3], LocalDateTime.parse(datosGasto[4]), Double.parseDouble(datosGasto[5]));
+                        ultimoGasto = new Gasto(Integer.parseInt(datosGasto[0]), getUsuarioID(idUsuarioPagador), getGrupoID(Integer.parseInt(datosGasto[2])), datosGasto[3], LocalDateTime.parse(datosGasto[4]), Double.parseDouble(datosGasto[5]));
                         siguienteId = ultimoGasto.getIdGasto() + 1;
                     }
                 } else {
@@ -885,7 +888,6 @@ public class Main {
             usuariosGrupo.add(idUsuarioGrupo);
             grupo.setUsuarios(usuariosGrupo); // Actualizar el conjunto de usuarios del grupo
 
-            ///AQUI TE FALTA ACTUALIZAR EL ARCHIVO HACIENDO UN ARCHIVO TEMPORAL Y LUEGO CAMBIANDOLE EL NOMBRE
 
             File archivoTemp = new File("gruposTemp.csv");
             File archivoOriginal = new File("grupos.csv");
