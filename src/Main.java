@@ -887,11 +887,61 @@ public class Main {
 
             ///AQUI TE FALTA ACTUALIZAR EL ARCHIVO HACIENDO UN ARCHIVO TEMPORAL Y LUEGO CAMBIANDOLE EL NOMBRE
 
-            ////
-            System.out.println("Usuario añadido al grupo correctamente.");
+            File archivoTemp = new File("gruposTemp.csv");
+            File archivoOriginal = new File("grupos.csv");
+
+            for (Grupo g : listaGruposArchivo()) {
+                if (g != null && g.getIdGrupo() != idGrupo) {
+                    BufferedWriter bw = null;
+                    try {
+                        TreeSet<Integer> usuarios = new TreeSet<>(g.getUsuarios());
+                        bw = new BufferedWriter(new FileWriter(archivoTemp, true));
+                        String linea = g.getIdGrupo() + "," + g.getNombreGrupo() + "," + g.getUsuarioAdmin().getIdUsuario() + ";" + usuarios;
+                        bw.write(linea);
+                        bw.newLine();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        try {
+                            bw.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } else {
+                    BufferedWriter bw = null;
+                    try {
+                        bw = new BufferedWriter(new FileWriter(archivoTemp, true));
+                        String linea = grupo.getIdGrupo() + "," + grupo.getNombreGrupo() + "," + grupo.getUsuarioAdmin().getIdUsuario() + ";" + grupo.getUsuarios();
+                        bw.write(linea);
+                        bw.newLine();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        try {
+                            bw.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+            }
+            if (archivoOriginal.delete()) {
+                if (archivoTemp.renameTo(archivoOriginal)) {
+                    System.out.println("Usuario añadido al grupo correctamente.");
+                } else {
+                    System.out.println("Error al renombrar el archivo temporal.");
+                }
+            } else {
+                System.out.println("Error al eliminar el archivo original.");
+            }
         } else {
             System.out.println("El ID del usuario no existe o ya está en el grupo");
         }
+
+
+
     } //ARREGLAR, NO FUNCIONA CORRECTAMENTE
 
     public static void verSaldo(int idGrupo){
