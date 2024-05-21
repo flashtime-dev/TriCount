@@ -627,8 +627,7 @@ public class Main {
         //Declaración de Scanner
         Scanner teclado = new Scanner(System.in);
 
-        //Crear Usuario
-        Usuario usuario = getUsuarioID(idUsuarioLogueado);
+
 
         //Datos del gasto a crear
         String[] datosGasto = new String[4];
@@ -650,7 +649,8 @@ public class Main {
             return;
         }
 
-
+        //Crear Usuario
+        Usuario usuario = getUsuarioID(idUsuarioPagador);
 
         //Crear Grupo
         Grupo grupo = getGrupoID(idGrupo);
@@ -671,7 +671,7 @@ public class Main {
                 if (!linea.isEmpty()) { // Verificar si la línea no está vacía
                     datosGasto = linea.split(",");
                     if (datosGasto.length > 0) {
-                        ultimoGasto = new Gasto(Integer.parseInt(datosGasto[0]), getUsuarioID(idUsuarioPagador), getGrupoID(Integer.parseInt(datosGasto[2])), datosGasto[3], LocalDateTime.parse(datosGasto[4]), Double.parseDouble(datosGasto[5]));
+                        ultimoGasto = new Gasto(Integer.parseInt(datosGasto[0]), getUsuarioID(Integer.parseInt(datosGasto[1])), getGrupoID(Integer.parseInt(datosGasto[2])), datosGasto[3], LocalDateTime.parse(datosGasto[4]), Double.parseDouble(datosGasto[5]));
                         siguienteId = ultimoGasto.getIdGasto() + 1;
                     }
                 } else {
