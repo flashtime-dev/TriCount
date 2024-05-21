@@ -849,6 +849,32 @@ public class Main {
 
         //AQUI HAY QUE BORRAR AL IGUAL QUE EL GASTO LAS LINEAS DE DIVISION DE GASTO QUE COINCIDAN CON EL ID DE GASTO
 
+        File archivoDivision = new File("divisiones.csv");
+        File archivoTempDivision = new File("divisionesTemp.csv");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivoDivision));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(archivoTempDivision))) {
+
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                int idGasto = Integer.parseInt(partes[1]); // Suponiendo que el ID del gasto está en la segunda columna
+                if (idGasto != id) {
+                    bw.write(linea);
+                    bw.newLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Eliminar el archivo original y renombrar el archivo temporal
+        if (!archivoDivision.delete()) {
+            System.out.println("No se pudo eliminar el archivo original");
+        }
+        if (!archivoTempDivision.renameTo(archivoDivision)) {
+            System.out.println("No se pudo renombrar el archivo temporal");
+        }
         // Actualizar lista de gastos
         //listaGastosArchivo();
 
