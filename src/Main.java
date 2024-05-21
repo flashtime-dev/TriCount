@@ -21,42 +21,42 @@ public class Main {
 
     }
 
-    public static void comprobarArchivos() {
-        File archivoUsuarios = null;
-        File archivoGrupos = null;
-        File archivoGastos = null;
-        File archivoDivisiones = null;
+    public static void comprobarArchivos() { //Comprueba si los archivos existen, si no los crea
+        File archivoUsuarios = null; //Archivo de usuarios
+        File archivoGrupos = null; //Archivo de grupos
+        File archivoGastos = null; //Archivo de gastos
+        File archivoDivisiones = null; //Archivo de divisiones de gastos
 
-        //Comprobacion de los archivos
-        try {
-            archivoUsuarios = new File("usuarios.csv");
-            archivoGrupos = new File("grupos.csv");
-            archivoGastos = new File("gastos.csv");
-            archivoDivisiones = new File("divisiones.csv");
+
+        try { //Intentamos crear los archivos
+            archivoUsuarios = new File("usuarios.csv"); //Archivo de usuarios
+            archivoGrupos = new File("grupos.csv"); //Archivo de grupos
+            archivoGastos = new File("gastos.csv"); //Archivo de gastos
+            archivoDivisiones = new File("divisiones.csv"); //Archivo de divisiones de gastos
 
             //Crear archivo en caso de que no exista
-            if (!archivoUsuarios.exists()) {
-                archivoUsuarios.createNewFile();
+            if (!archivoUsuarios.exists()) { //Si el archivo de usuarios no existe
+                archivoUsuarios.createNewFile();  //Creamos el archivo
             }
-            if (!archivoGrupos.exists()) {
-                archivoGrupos.createNewFile();
+            if (!archivoGrupos.exists()) { //Si el archivo de grupos no existe
+                archivoGrupos.createNewFile(); //Creamos el archivo
             }
-            if (!archivoGastos.exists()) {
-                archivoGastos.createNewFile();
+            if (!archivoGastos.exists()) { //Si el archivo de gastos no existe
+                archivoGastos.createNewFile(); //Creamos el archivo
             }
-            if (!archivoDivisiones.exists()) {
-                archivoDivisiones.createNewFile();
+            if (!archivoDivisiones.exists()) { //Si el archivo de divisiones de gastos no existe
+                archivoDivisiones.createNewFile(); //Creamos el archivo
             }
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) { //En caso de error
+            throw new RuntimeException(e); //Lanzamos una excepción
         }
 
     }
 
     public static void menuPrincipal() {
         //Selector de menuPrincipal
-        byte opcion = 0;
+        byte opcion = 0; //Opción seleccionada
 
         //Declaración de Scanner
         Scanner teclado = new Scanner(System.in);
@@ -98,7 +98,7 @@ public class Main {
 
     //Lista de usuarios
 
-    public static List<Usuario> listaUsuariosArchivo() {
+    public static List<Usuario> listaUsuariosArchivo() { //Devuelve una lista de usuarios
         //Datos del usuario a crear
         String[] datosUsuario = new String[3];
 
@@ -110,11 +110,11 @@ public class Main {
             File archivo = new File("usuarios.csv");
 
             Scanner entrada = new Scanner(archivo);
-            while (entrada.hasNextLine()) {
-                datosUsuario = entrada.nextLine().split(",");
-                usuarios.add(new Usuario(Integer.parseInt(datosUsuario[0]), datosUsuario[1], datosUsuario[2]));
+            while (entrada.hasNextLine()) { //Mientras haya una siguiente línea
+                datosUsuario = entrada.nextLine().split(","); //Separamos los datos por comas
+                usuarios.add(new Usuario(Integer.parseInt(datosUsuario[0]), datosUsuario[1], datosUsuario[2])); //Añadimos el usuario a la lista
             }
-            entrada.close();
+            entrada.close(); //Cerramos el scanner
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -123,7 +123,7 @@ public class Main {
     }
 
     //Menú de loggeo
-    public static void logueo() {
+    public static void logueo() { //Método de logueo
         //Declaración de variables relacionadas con el inicio y registro de sesión
         String usuario = "";
         String passwd = ""; //(Contraseña)
@@ -337,6 +337,36 @@ public class Main {
             return;
         }
         Grupo grupo = getGrupoID(id);
+
+        //Eliminar las divisiones de gastos asociadas al grupo
+        File archivoDivisiones = new File("divisiones.csv");
+        File archivoTempDivisiones = new File("divisionesTemp.csv");
+        int idGasto = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivoDivisiones));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(archivoTempDivisiones))) {
+
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                idGasto = Integer.parseInt(partes[1]); // Suponiendo que el ID del gasto está en la segunda columna
+                if (getGastoID(idGasto).getGrupo().getIdGrupo() != id) {
+                    bw.write(linea);
+                    bw.newLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Eliminar el archivo original y renombrar el archivo temporal
+        if (!archivoDivisiones.delete()) {
+            System.out.println("No se pudo eliminar el archivo original");
+        }
+        if (!archivoTempDivisiones.renameTo(archivoDivisiones)) {
+            System.out.println("No se pudo renombrar el archivo temporal");
+        }
+
         if (idUsuarioLogueado == grupo.getUsuarioAdmin().getIdUsuario()) {
             System.out.println(grupo.getIdGrupo() + " - " + grupo.getNombreGrupo());
             File archivoTemp = new File("gruposTemp.csv");
@@ -373,6 +403,40 @@ public class Main {
         } else {
             System.out.println("No tienes permisos para borrar este grupo");
         }
+
+
+
+
+        // Eliminar los gastos asociados al grupo
+
+        File archivoGastos = new File("gastos.csv");
+        File archivoTempGastos = new File("gastosTemp.csv");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivoGastos));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(archivoTempGastos))) {
+
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                int idGrupo = Integer.parseInt(partes[2]); // Suponiendo que el ID del grupo está en la tercera columna
+                if (idGrupo != id) {
+                    bw.write(linea);
+                    bw.newLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Eliminar el archivo original y renombrar el archivo temporal
+        if (!archivoGastos.delete()) {
+            System.out.println("No se pudo eliminar el archivo original");
+        }
+        if (!archivoTempGastos.renameTo(archivoGastos)) {
+            System.out.println("No se pudo renombrar el archivo temporal");
+        }
+
+
     }
 
     public static void crearGrupo(int idUsuarioLogueado) {
@@ -846,8 +910,6 @@ public class Main {
                 System.out.println("No se pudo renombrar el archivo temporal");
             }
         }
-
-        //AQUI HAY QUE BORRAR AL IGUAL QUE EL GASTO LAS LINEAS DE DIVISION DE GASTO QUE COINCIDAN CON EL ID DE GASTO
 
         File archivoDivision = new File("divisiones.csv");
         File archivoTempDivision = new File("divisionesTemp.csv");
